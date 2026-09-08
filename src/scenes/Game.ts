@@ -79,9 +79,9 @@ export class GameScene extends Phaser.Scene {
 
         // Build the current level
         let defaultSpawnX = TILE_SIZE * 2;
-        let defaultSpawnY = yOffset + gridHeight - TILE_SIZE * 2;
+        let defaultSpawnY = yOffset + gridHeight - TILE_SIZE * 2 - 13;
         let doorX = worldWidth - TILE_SIZE * 2;
-        let doorY = yOffset + gridHeight - TILE_SIZE * 2;
+        let doorY = yOffset + gridHeight - TILE_SIZE * 2 - 13;
 
         for (let row = 0; row < this.levelData.grid.length; row++) {
             const line = this.levelData.grid[row];
@@ -180,7 +180,7 @@ export class GameScene extends Phaser.Scene {
                     b.setOffset(4, 12);
                 } else if (char === '@') {
                     defaultSpawnX = x;
-                    defaultSpawnY = y;
+                    defaultSpawnY = y - 13; // Elevated 13px so feet rest cleanly on top of the floor tile
                 } else if (char === '1' || char === '2' || char === '3') {
                     const type: EnemyType = char === '1' ? 'spider' : char === '2' ? 'ufo' : 'sun';
                     const enemy = new Enemy(this, x, y, type);
