@@ -40,6 +40,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     private walkTimer = 0;
     private walkFrame = 0;
     public facingRight = true;
+    private canDoubleJump = false;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         const char = CharacterManager.getSelected();
@@ -204,9 +205,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
                 }
             }
 
-            // --- JUMPING PHYSICS (Coyote Time & Jump Buffering) ---
+            // --- JUMPING PHYSICS (Coyote Time, Single Tap Small Jump & Double Space Big Jump) ---
             if (this.isGrounded) {
                 this.coyoteCounter = this.coyoteTime;
+                this.canDoubleJump = true;
             } else {
                 this.coyoteCounter -= delta;
             }
@@ -217,15 +219,16 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
                 this.jumpBufferCounter -= delta;
             }
 
-            // Normal jumping works always when grounded
+            // Normal jumping from ground (1 Space = Controlled / Small Jump)
             if (this.jumpBufferCounter > 0 && this.coyoteCounter > 0) {
-                body.setVelocityY(this.jumpVelocity);
+                body.setVelocityY(-400); // Initial crisp jump
                 this.jumpBufferCounter = 0;
                 this.coyoteCounter = 0;
+                this.canDoubleJump = true;
                 SoundManager.playJump();
 
                 // Create little jump dust puff
-                const dust = this.scene.add.sprite(this.x, this.y + 10, 'particle-smoke');
+                const dust = this.scene.add.sprite(this.x, this.y + 12, 'particle-smoke');
                 dust.setScale(0.6);
                 this.scene.tweens.add({
                     targets: dust,
@@ -234,11 +237,30 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
                     duration: 250,
                     onComplete: () => dust.destroy()
                 });
+            } else if (jumpJustPressed && !this.isGrounded && this.canDoubleJump && !this.isJetpackActive) {
+                // Double Space = BIGGER JUMP (Double Jump in air!)
+                this.canDoubleJump = false;
+                this.jumpBufferCounter = 0;
+                body.setVelocityY(-480); // Bigger boost leap!
+                SoundManager.playJump();
+
+                // Glowing energy ripple effect under feet
+                const ring = this.scene.add.sprite(this.x, this.y + 16, 'particle-sparkle');
+                ring.setScale(1.4);
+                ring.setTint(0x00ffff);
+                this.scene.tweens.add({
+                    targets: ring,
+                    scaleX: 2.2,
+                    scaleY: 0.8,
+                    alpha: 0,
+                    duration: 300,
+                    onComplete: () => ring.destroy()
+                });
             }
 
-            // Variable Jump Height: forgiving threshold so light taps still clear 3-4 tiles
-            if (!jumpDown && !upDown && body.velocity.y < -140) {
-                body.setVelocityY(body.velocity.y * 0.75);
+            // Variable Jump Height: Light tap = smaller jump, holding space = full reach
+            if (!jumpDown && !upDown && body.velocity.y < -120) {
+                body.setVelocityY(body.velocity.y * 0.65);
             }
         }
 
