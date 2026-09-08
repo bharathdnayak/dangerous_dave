@@ -211,10 +211,10 @@ export const LEVELS: LevelData[] = [
             "B                  BBBBBBB             BBBBBBB                  B",
             "B                                3                              B",
             "B             BBBBBBB                                           B",
-            "B   G   J                                    C                  B",
+            "B @ G   J                                    C                  B",
             "BBBBBBBBBBB             R          S       BBBBB              D B",
-            "B @                   BBBBB      BBBBB                      BBBBB",
-            "BBBBBBBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBBBBBBBBBBBBBB",
+            "BBBBBBBBBBB           BBBBB      BBBBB                      BBBBB",
+            "BBBBBBBBBBBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBBBBBBBBBBBBBB",
             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
         ]
     }
