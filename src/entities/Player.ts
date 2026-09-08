@@ -54,6 +54,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         const body = this.body as Phaser.Physics.Arcade.Body;
         body.setSize(22, 48);
         body.setOffset(13, 12);
+        body.setMaxVelocity(320, 560); // Cap velocity to prevent high-speed tunneling through blocks
+        body.checkCollision.up = true;
+        body.checkCollision.down = true;
+        body.checkCollision.left = true;
+        body.checkCollision.right = true;
 
         if (scene.input.keyboard) {
             this.cursors = scene.input.keyboard.createCursorKeys();
@@ -306,6 +311,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         const textureKey = this.computeTextureKey();
         if (this.texture.key !== textureKey && this.scene.textures.exists(textureKey)) {
             this.setTexture(textureKey);
+            // Ensure hitbox dimensions and offset are maintained across animation switches
+            const b = this.body as Phaser.Physics.Arcade.Body;
+            if (b) {
+                b.setSize(22, 48);
+                b.setOffset(13, 12);
+            }
         }
     }
 

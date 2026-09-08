@@ -23,7 +23,10 @@ const config: Phaser.Types.Core.GameConfig = {
         default: 'arcade',
         arcade: {
             gravity: { y: 1100, x: 0 },
-            debug: false
+            debug: false,
+            tileBias: 48, // Prevent tunneling through 40px rock platforms
+            fps: 60,
+            fixedStep: true
         }
     },
     scene: [Preloader, GameScene]

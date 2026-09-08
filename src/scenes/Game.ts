@@ -52,6 +52,7 @@ export class GameScene extends Phaser.Scene {
         const worldHeight = Math.max(gridHeight, 480);
         const yOffset = Math.floor((worldHeight - gridHeight) / 2);
         this.physics.world.setBounds(0, 0, worldWidth, worldHeight);
+        this.physics.world.TILE_BIAS = 48; // Solid collision check against 40px tiles
 
         // Physics groups
         this.platforms = this.physics.add.staticGroup();
