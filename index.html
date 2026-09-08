@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dangerous Dave: Enhanced Modern Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+      /* CRT scanline overlay effect */
+      .crt::after {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 0; left: 0; bottom: 0; right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.04));
+        z-index: 15;
+        background-size: 100% 3px, 4px 100%;
+        pointer-events: none;
+      }
+      .font-arcade {
+        font-family: 'Press Start 2P', monospace;
+      }
+      .font-ui {
+        font-family: 'Outfit', sans-serif;
+      }
+      /* Prevent scrolling on arrow keys */
+      html, body {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background: #000;
+      }
+      #game-container {
+        width: 100vw;
+        height: 100vh;
+      }
+      #game-container canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain; /* Fills screen cleanly without stretching */
+        image-rendering: pixelated;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: crisp-edges;
+      }
+    </style>
+  </head>
+  <body class="bg-black text-white font-arcade antialiased select-none">
+    <div id="app" class="relative w-screen h-screen flex justify-center items-center overflow-hidden">
+      
+      <!-- Phaser Canvas Container -->
+      <div id="game-container" class="absolute inset-0 flex justify-center items-center z-0"></div>
+
+      <!-- Optional CRT filter layer -->
+      <div id="crt-overlay" class="absolute inset-0 pointer-events-none z-10 transition-opacity duration-300"></div>
+
+      <!-- Modern UI Overlay Layer -->
+      <div id="ui-layer" class="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between p-2 md:p-4">
+        
+        <!-- Top HUD -->
+        <div id="hud" class="hidden w-full flex justify-between items-start transition-opacity duration-300 pointer-events-none">
+          
+          <!-- Left HUD: Score & Level & Quick Prev/Next -->
+          <div class="flex flex-col gap-1 bg-black/75 backdrop-blur-sm px-3 py-2 rounded border border-white/20 pointer-events-auto shadow-lg">
+            <div class="text-[11px] md:text-xs text-yellow-400">SCORE: <span id="score-val" class="text-white">0</span></div>
+            <div class="flex items-center gap-2 text-[9px] md:text-[10px] text-gray-300">
+              <span>LVL: <strong id="level-val" class="text-yellow-300">1</strong>/10</span>
+              <button id="btn-quick-prev" title="Go to Previous Level" class="px-1.5 py-0.5 bg-blue-900 hover:bg-blue-700 rounded text-[8px] text-white border border-blue-400">◄ PREV</button>
+              <button id="btn-quick-next" title="Go to Next Level" class="px-1.5 py-0.5 bg-blue-900 hover:bg-blue-700 rounded text-[8px] text-white border border-blue-400">NEXT ►</button>
+            </div>
+          </div>
+
+          <!-- Dynamic Tutorial / Alert Banner (Center) -->
+          <div id="tutorial-banner" class="max-w-sm md:max-w-md text-center bg-black/80 backdrop-blur-md px-3 py-1.5 rounded border border-yellow-500/60 text-[9px] md:text-[11px] leading-relaxed text-white opacity-0 transition-opacity duration-300 pointer-events-none shadow-xl">
+          </div>
+
+          <!-- Right HUD: Lives, Jetpack & Quick Actions -->
+          <div class="flex flex-col items-end gap-1 pointer-events-auto">
+            <div class="flex items-center gap-2 bg-black/75 backdrop-blur-sm px-3 py-1.5 rounded border border-white/20 shadow-lg">
+              <span class="text-[10px] text-red-400">LIVES:</span>
+              <div id="lives-container" class="flex gap-1 text-red-500 text-xs">
+                <span>&#10084;</span>
+                <span>&#10084;</span>
+                <span>&#10084;</span>
+              </div>
+            </div>
+
+            <!-- Jetpack Fuel Bar & Toggle -->
+            <div id="jetpack-ui" class="hidden flex items-center gap-2 bg-black/80 backdrop-blur-sm px-2.5 py-1 rounded border border-cyan-400/60 shadow-lg">
+              <button id="btn-jetpack-toggle" title="Toggle Jetpack (Press J)" class="px-2 py-0.5 bg-black/75 hover:bg-cyan-700 border border-cyan-400 rounded text-[8px] text-cyan-200 font-bold transition-colors">
+                🚀 JET: OFF (J)
+              </button>
+              <div class="w-20 md:w-28 h-2.5 bg-gray-800 rounded-full overflow-hidden border border-cyan-500/50">
+                <div id="fuel-bar" class="h-full bg-gradient-to-r from-cyan-400 to-blue-500 w-full transition-all duration-75"></div>
+              </div>
+            </div>
+
+            <!-- Quick Action Toggles -->
+            <div class="flex gap-1 mt-0.5">
+              <button id="btn-hud-char" title="Change Character" class="px-2 py-1 bg-gradient-to-r from-cyan-600 to-blue-700 hover:scale-105 border border-cyan-400 rounded text-[9px] text-white font-bold transition-transform">
+                👤 HERO
+              </button>
+              <button id="btn-zoom-toggle" title="Toggle Zoom Level (Z)" class="px-2 py-1 bg-black/70 hover:bg-white/20 border border-white/20 rounded text-[9px] text-gray-200">
+                ZOOM: 1x
+              </button>
+              <button id="btn-fullscreen" title="Toggle Fullscreen (F)" class="px-2 py-1 bg-black/70 hover:bg-white/20 border border-white/20 rounded text-[9px] text-gray-200">
+                ⛶ FULL
+              </button>
+              <button id="btn-sound-toggle" title="Toggle Sound" class="px-2 py-1 bg-black/70 hover:bg-white/20 border border-white/20 rounded text-[9px] text-gray-200">
+                SFX: ON
+              </button>
+              <button id="btn-crt-toggle" title="Toggle CRT Retro Filter" class="px-2 py-1 bg-black/70 hover:bg-white/20 border border-white/20 rounded text-[9px] text-gray-200">
+                CRT: OFF
+              </button>
+              <button id="btn-menu-open" title="Open Menu" class="px-2 py-1 bg-red-800 hover:bg-red-700 border border-white/20 rounded text-[9px] text-white">
+                MENU
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Touch Controls for Mobile / Tablets -->
+        <div id="touch-controls" class="hidden w-full flex justify-between items-end pb-2 pointer-events-auto md:hidden">
+          <div class="flex gap-2">
+            <button id="touch-left" class="w-14 h-14 bg-white/20 active:bg-white/40 border-2 border-white rounded-full text-xl flex items-center justify-center">&#8592;</button>
+            <button id="touch-right" class="w-14 h-14 bg-white/20 active:bg-white/40 border-2 border-white rounded-full text-xl flex items-center justify-center">&#8594;</button>
+          </div>
+          <div class="flex gap-2">
+            <button id="touch-shoot" class="w-14 h-14 bg-yellow-500/30 active:bg-yellow-500/60 border-2 border-yellow-400 rounded-full text-xs font-bold flex items-center justify-center">GUN</button>
+            <button id="touch-jump" class="w-16 h-16 bg-red-600/40 active:bg-red-600/70 border-2 border-red-400 rounded-full text-xs font-bold flex items-center justify-center">JUMP</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MAIN MENU MODAL -->
+      <div id="main-menu" class="absolute inset-0 bg-black/90 pointer-events-auto flex flex-col items-center justify-center z-30 backdrop-blur-md transition-opacity duration-300">
+        <div class="text-center mb-6">
+          <div class="text-[10px] text-yellow-400 tracking-[0.3em] mb-2 uppercase">1988 Classic Reimagined</div>
+          <h1 class="text-4xl md:text-6xl text-red-600 drop-shadow-[4px_4px_0px_#FFFFFF] tracking-wider mb-2">DANGEROUS<br>DAVE</h1>
+          <div class="inline-block bg-yellow-500 text-black px-3 py-1 text-[10px] font-bold tracking-widest uppercase rounded">
+            Enhanced Smooth Edition
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3 w-64">
+          <button id="btn-play" class="w-full py-3.5 bg-red-600 hover:bg-red-500 text-white border-4 border-white shadow-[4px_4px_0px_#000] hover:scale-105 transition-all text-xs font-bold">
+            START GAME
+          </button>
+          <button id="btn-character-select" class="w-full py-2.5 bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white border-2 border-cyan-300 shadow-[3px_3px_0px_#000] hover:scale-105 transition-all text-[10px] font-bold">
+            👤 CHOOSE HERO
+          </button>
+          <button id="btn-level-select" class="w-full py-2.5 bg-blue-700 hover:bg-blue-600 text-white border-2 border-white shadow-[3px_3px_0px_#000] hover:scale-105 transition-all text-[10px]">
+            LEVEL SELECT (1 - 10)
+          </button>
+          <button id="btn-controls" class="w-full py-2.5 bg-gray-800 hover:bg-gray-700 text-white border-2 border-gray-400 shadow-[3px_3px_0px_#000] hover:scale-105 transition-all text-[10px]">
+            HOW TO PLAY & IMPROVEMENTS
+          </button>
+          <button id="btn-menu-fullscreen" class="w-full py-2 bg-gray-900 hover:bg-gray-800 text-yellow-400 border border-yellow-400 text-[9px]">
+            ⛶ TOGGLE FULLSCREEN
+          </button>
+        </div>
+
+        <div class="mt-8 text-[9px] text-gray-500 text-center font-ui">
+          Built with Phaser 3 & Modern Web Physics | College 7th Sem UI Project
+        </div>
+      </div>
+
+      <!-- CHARACTER SELECT MODAL -->
+      <div id="character-select-modal" class="hidden absolute inset-0 bg-black/95 pointer-events-auto flex flex-col items-center justify-center z-45 p-4">
+        <div class="bg-gray-950 border-4 border-cyan-400 p-6 max-w-2xl w-full rounded-lg shadow-[8px_8px_0px_#000]">
+          <div class="text-center mb-6">
+            <span class="text-[9px] text-cyan-400 tracking-widest uppercase">2026 Edition</span>
+            <h2 class="text-2xl text-white font-bold drop-shadow-[2px_2px_0px_#00FFFF]">CHOOSE YOUR HERO</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" id="character-cards-grid">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <div class="flex justify-center">
+            <button id="btn-close-character-select" class="px-8 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 hover:scale-105 transition-all border-2 border-white text-xs font-bold shadow-[3px_3px_0px_#000]">
+              CONFIRM HERO
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEVEL SELECT MODAL -->
+      <div id="level-select-modal" class="hidden absolute inset-0 bg-black/90 pointer-events-auto flex flex-col items-center justify-center z-40">
+        <div class="bg-gray-900 border-4 border-yellow-400 p-6 md:p-8 max-w-lg w-full rounded shadow-[8px_8px_0px_#000]">
+          <h2 class="text-xl md:text-2xl text-yellow-400 mb-6 text-center">SELECT A LEVEL</h2>
+          <div class="grid grid-cols-5 gap-3 mb-6" id="level-buttons-grid">
+            <!-- Dynamically populated 1 to 10 -->
+          </div>
+          <div class="flex justify-center">
+            <button id="btn-close-level-select" class="px-6 py-2 bg-red-600 hover:bg-red-500 border-2 border-white text-xs">
+              CANCEL
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTROLS & IMPROVEMENTS MODAL -->
+      <div id="controls-modal" class="hidden absolute inset-0 bg-black/95 pointer-events-auto flex flex-col items-center justify-center z-40 p-4">
+        <div class="border-4 border-white p-6 md:p-8 max-w-xl w-full bg-blue-950 rounded shadow-[8px_8px_0px_#000] max-h-[90vh] overflow-y-auto">
+          <h2 class="text-xl md:text-2xl text-yellow-400 mb-4 text-center">HOW TO PLAY</h2>
+          
+          <div class="text-[11px] leading-relaxed mb-6 space-y-2">
+            <div class="flex justify-between border-b border-blue-800 pb-1">
+              <span class="text-yellow-400">MOVE</span>
+              <span>[WASD] or [ARROW KEYS]</span>
+            </div>
+            <div class="flex justify-between border-b border-blue-800 pb-1">
+              <span class="text-yellow-400">JUMP</span>
+              <span>[SPACE] or [W] / [UP]</span>
+            </div>
+            <div class="flex justify-between border-b border-blue-800 pb-1">
+              <span class="text-yellow-400">SHOOT GUN</span>
+              <span>[SHIFT] (when equipped)</span>
+            </div>
+            <div class="flex justify-between border-b border-blue-800 pb-1">
+              <span class="text-yellow-400">JETPACK</span>
+              <span>Press [J] to toggle hover, or hold [SPACE]/[W]</span>
+            </div>
+            <div class="flex justify-between border-b border-blue-800 pb-1">
+              <span class="text-yellow-400">GO TO PREV LEVEL</span>
+              <span>Walk off left edge or click [◄ PREV]</span>
+            </div>
+            <div class="flex justify-between border-b border-blue-800 pb-1">
+              <span class="text-yellow-400">OBJECTIVE</span>
+              <span class="text-right">Get the GOLD TROPHY to unlock EXIT DOOR</span>
+            </div>
+          </div>
+
+          <h3 class="text-xs md:text-sm text-green-400 mb-2">MODERN ENHANCEMENTS:</h3>
+          <ul class="text-[9px] md:text-[10px] text-gray-300 space-y-1.5 mb-6 list-disc pl-4 font-ui">
+            <li><strong>Full Screen Viewport:</strong> Dynamic 16:9 pixel-perfect scaling with no vertical letterbox voids.</li>
+            <li><strong>Smooth 4-Direction Jetpack:</strong> Full omnidirectional hovering and flight controls.</li>
+            <li><strong>Level Backwards Traversal:</strong> Hop back to previous levels anytime to farm points or explore!</li>
+            <li><strong>Coyote Time & Jump Buffering:</strong> No more falling abruptly like a stone.</li>
+            <li><strong>Fair Hitboxes:</strong> Close calls won't cause instant deaths.</li>
+          </ul>
+
+          <div class="flex justify-center">
+            <button id="btn-close-controls" class="px-8 py-2 bg-red-600 hover:bg-red-500 border-2 border-white text-xs">
+              GOT IT!
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAME OVER / VICTORY MODAL -->
+      <div id="game-over-modal" class="hidden absolute inset-0 bg-black/90 pointer-events-auto flex flex-col items-center justify-center z-50">
+        <div class="border-4 border-white p-8 max-w-md w-full bg-gray-950 text-center shadow-[8px_8px_0px_#000]">
+          <h1 id="game-over-title" class="text-3xl md:text-4xl text-red-500 mb-4 drop-shadow-[3px_3px_0px_#fff]">GAME OVER</h1>
+          <p class="text-xs text-gray-300 mb-2">FINAL SCORE</p>
+          <div id="final-score" class="text-2xl text-yellow-400 mb-8 font-bold">0</div>
+          
+          <div class="flex flex-col gap-3">
+            <button id="btn-restart" class="w-full py-3 bg-yellow-500 hover:bg-yellow-400 text-black border-2 border-white text-xs font-bold">
+              PLAY AGAIN
+            </button>
+            <button id="btn-back-to-menu" class="w-full py-2 bg-gray-800 hover:bg-gray-700 text-white border-2 border-gray-500 text-[10px]">
+              MAIN MENU
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
