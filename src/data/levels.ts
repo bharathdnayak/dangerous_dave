@@ -17,15 +17,15 @@ export const LEVELS: LevelData[] = [
         grid: [
             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
             "B                                          B",
-            "B                                          B",
             "B  T                                       B",
-            "BBBBBBBBBBB                                B",
-            "B         BBBB    BBBB   BBBB   BBBB       B",
-            "B                    R      S      E       B",
-            "B            BBBB                     BBBB B",
-            "B         BBBB                        C  D B",
-            "B      BBBB                         BBBBBBBB",
-            "B @           R       S       E     BBBBBBBB",
+            "BBBBBBBBBBBB                               B",
+            "B                                          B",
+            "B              BBBB    BBBB   BBBB         B",
+            "B                         R      S         B",
+            "B          BBBB                        E   B",
+            "B                                    BBBBB B",
+            "B      BBBB                          C   D B",
+            "B @           R        S        E    BBBBBBB",
             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
         ]
     },
