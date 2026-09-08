@@ -22,6 +22,8 @@ export class GameScene extends Phaser.Scene {
     private isChangingLevel = false;
     private spawnAtExit = false;
     private lockedDoorAlertTimer = 0;
+    private fireHazards: Phaser.Physics.Arcade.Sprite[] = [];
+    private fireEmberTimer = 0;
 
     constructor() {
         super('GameScene');
@@ -35,6 +37,8 @@ export class GameScene extends Phaser.Scene {
         this.hasTrophy = false;
         this.isChangingLevel = false;
         this.enemies = [];
+        this.fireHazards = [];
+        this.fireEmberTimer = 0;
         this.lockedDoorAlertTimer = 0;
     }
 
@@ -96,6 +100,19 @@ export class GameScene extends Phaser.Scene {
                     const b = fire.body as Phaser.Physics.Arcade.Body;
                     b.setSize(28, 22);
                     b.setOffset(6, 18);
+                    this.fireHazards.push(fire);
+
+                    // Dynamic warm pulsing ambient light
+                    this.tweens.add({
+                        targets: fire,
+                        scaleX: 1.05,
+                        scaleY: 1.06,
+                        alpha: 0.93,
+                        yoyo: true,
+                        repeat: -1,
+                        duration: 450 + Math.random() * 200,
+                        ease: 'Sine.easeInOut'
+                    });
                 } else if (char === 'W') {
                     const water = this.hazards.create(x, y, 'water');
                     const b = water.body as Phaser.Physics.Arcade.Body;
@@ -249,6 +266,33 @@ export class GameScene extends Phaser.Scene {
                             this.updateUI();
                             enemy.destroyWithEffect();
                         }
+                    });
+                }
+            }
+        }
+
+        // Dynamic convective rising flame ember particles
+        this.fireEmberTimer += delta;
+        if (this.fireEmberTimer > 100) {
+            this.fireEmberTimer = 0;
+            for (const fire of this.fireHazards) {
+                if (fire.active && Math.random() < 0.35) {
+                    const ember = this.add.sprite(
+                        fire.x + (Math.random() - 0.5) * 24,
+                        fire.y - 10,
+                        'particle-sparkle'
+                    );
+                    ember.setScale(0.55);
+                    ember.setTint(0xffaa22);
+                    this.tweens.add({
+                        targets: ember,
+                        y: ember.y - 28 - Math.random() * 16,
+                        x: ember.x + (Math.random() - 0.5) * 16,
+                        alpha: 0,
+                        scale: 0.1,
+                        duration: 650 + Math.random() * 250,
+                        ease: 'Sine.easeOut',
+                        onComplete: () => ember.destroy()
                     });
                 }
             }

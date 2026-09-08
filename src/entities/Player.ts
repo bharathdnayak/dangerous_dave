@@ -35,7 +35,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     public jetpackFuel = 100; // 0 to 100
     public isDead = false;
 
-    // Animation timer
+    // Animation & weapon timers
+    private shootTimer = 0;
     private walkTimer = 0;
     private walkFrame = 0;
     public facingRight = true;
@@ -48,10 +49,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         this.setCollideWorldBounds(true);
-        // Fair, forgiving HD hitbox (player is 36x58, hitbox is 20x48 centered with corner clearance)
+        // Fair, forgiving HD hitbox calibrated for 48x62 sprite
         const body = this.body as Phaser.Physics.Arcade.Body;
-        body.setSize(20, 48);
-        body.setOffset(8, 8);
+        body.setSize(22, 48);
+        body.setOffset(13, 12);
 
         if (scene.input.keyboard) {
             this.cursors = scene.input.keyboard.createCursorKeys();
@@ -244,28 +245,73 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         // --- SHOOTING ---
         if (this.hasGun && Phaser.Input.Keyboard.JustDown(this.shootKey)) {
             SoundManager.playShoot();
-            const spawnX = this.facingRight ? this.x + 12 : this.x - 12;
+            this.shootTimer = 220; // 220ms forward firing stance with weapon drawn & muzzle flare
+            const spawnX = this.facingRight ? this.x + 22 : this.x - 22;
             const dir = this.facingRight ? 1 : -1;
             if (onShootBullet) {
-                onShootBullet(spawnX, this.y - 2, dir);
+                onShootBullet(spawnX, this.y - 1, dir);
             }
+
+            // High-energy muzzle flash particle flare
+            const flash = this.scene.add.sprite(spawnX, this.y - 1, 'particle-sparkle');
+            flash.setScale(1.2);
+            flash.setTint(0x00ffff);
+            this.scene.tweens.add({
+                targets: flash,
+                scale: 0.1,
+                alpha: 0,
+                duration: 150,
+                onComplete: () => flash.destroy()
+            });
         }
 
-        // --- ANIMATIONS ---
-        if (this.isJetpackActive && this.hasJetpack && this.jetpackFuel > 0) {
-            this.setTexture(`${this.characterId}-jetpack`);
-        } else if (!this.isGrounded) {
-            this.setTexture(`${this.characterId}-jump`);
-        } else if (body.velocity.x !== 0) {
+        if (this.shootTimer > 0) {
+            this.shootTimer -= delta;
+        }
+
+        // --- ANIMATIONS (4-Frame Stride Cycle: Stride Left, Pass, Stride Right, Pass) ---
+        if (body.velocity.x !== 0 && this.isGrounded) {
             this.walkTimer += delta;
-            if (this.walkTimer > 110) {
+            if (this.walkTimer > 95) { // ~10.5 fps fluid walking animation
                 this.walkTimer = 0;
-                this.walkFrame = (this.walkFrame + 1) % 2;
-                this.setTexture(this.walkFrame === 0 ? `${this.characterId}-walk1` : `${this.characterId}-walk2`);
+                this.walkFrame = (this.walkFrame + 1) % 4;
             }
         } else {
-            this.setTexture(`${this.characterId}-idle`);
+            this.walkTimer = 0;
+            this.walkFrame = 0;
         }
+
+        const textureKey = this.computeTextureKey();
+        if (this.texture.key !== textureKey && this.scene.textures.exists(textureKey)) {
+            this.setTexture(textureKey);
+        }
+    }
+
+    public computeTextureKey(): string {
+        const id = this.characterId;
+        const g = this.hasGun;
+        const j = this.hasJetpack;
+        const gear = (g && j) ? 'gunjet' : g ? 'gun' : j ? 'jet' : '';
+        const tag = gear ? `-${gear}` : '';
+
+        // Active Jetpack flight thrusters
+        if (this.isJetpackActive && j && this.jetpackFuel > 0) {
+            return `${id}${tag}-flight`;
+        }
+        // Firing weapon stance (plasma rifle extended forward with muzzle flare)
+        if (this.shootTimer > 0 && g) {
+            return `${id}${tag}-shoot`;
+        }
+        // In air / jumping
+        if (!this.isGrounded) {
+            return `${id}${tag}-jump`;
+        }
+        // Walking on ground (4-frame cycle with arm swings and head bob)
+        if (Math.abs(this.body.velocity.x) > 10) {
+            return `${id}${tag}-walk${this.walkFrame}`;
+        }
+        // Standing idle (with weapon slung over shoulder if hasGun)
+        return `${id}${tag}-idle`;
     }
 
     public die() {
@@ -292,7 +338,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     public setCharacter(charId: string) {
         this.characterId = charId;
-        this.setTexture(`${this.characterId}-idle`);
+        const key = this.computeTextureKey();
+        if (this.scene.textures.exists(key)) {
+            this.setTexture(key);
+        }
     }
 
     public toggleJetpack(): boolean {

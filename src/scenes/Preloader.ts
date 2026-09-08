@@ -15,7 +15,7 @@ export class Preloader extends Phaser.Scene {
     }
 
     private createAnimations() {
-        // High-definition animated realistic fire
+        // High-definition animated realistic fire (8-frame fluid combustion cycle)
         this.anims.create({
             key: 'fire-burn',
             frames: [
@@ -23,81 +23,95 @@ export class Preloader extends Phaser.Scene {
                 { key: 'fire-1' },
                 { key: 'fire-2' },
                 { key: 'fire-3' },
-                { key: 'fire-4' }
+                { key: 'fire-4' },
+                { key: 'fire-5' },
+                { key: 'fire-6' },
+                { key: 'fire-7' }
             ],
-            frameRate: 12,
+            frameRate: 14,
             repeat: -1
         });
     }
 
     private generateModernHDAssets() {
         // ==========================================
-        // 1. HIGH-DEFINITION REALISTIC FIRE (5 Frames)
-        // 40x40 Smooth Bezier Flame Rendering
+        // 1. HIGH-DEFINITION REALISTIC FIRE (8 Frames)
+        // 40x40 Smooth Multi-Layered Bezier Flame with Lava Bed
         // ==========================================
-        for (let f = 0; f < 5; f++) {
+        for (let f = 0; f < 8; f++) {
             const c = document.createElement('canvas'); c.width = 40; c.height = 40;
             const ctx = c.getContext('2d')!;
 
             // Molten magma base
             const baseGrad = ctx.createLinearGradient(0, 32, 0, 40);
             baseGrad.addColorStop(0, '#ff3300');
-            baseGrad.addColorStop(1, '#660000');
+            baseGrad.addColorStop(0.5, '#cc1100');
+            baseGrad.addColorStop(1, '#440000');
             ctx.fillStyle = baseGrad;
             ctx.beginPath();
-            ctx.roundRect(0, 34, 40, 6, [2, 2, 0, 0]);
+            ctx.roundRect(0, 34, 40, 6, [3, 3, 0, 0]);
+            ctx.fill();
+
+            // Bubbling magma nodes
+            const bubblePhase = (f / 8) * Math.PI * 2;
+            ctx.fillStyle = '#ffaa00';
+            ctx.beginPath();
+            ctx.arc(8 + Math.sin(bubblePhase) * 2, 35 - Math.abs(Math.sin(bubblePhase)) * 2, 2.2, 0, Math.PI * 2);
+            ctx.arc(28 + Math.cos(bubblePhase) * 2, 35 - Math.abs(Math.cos(bubblePhase)) * 2, 2.5, 0, Math.PI * 2);
             ctx.fill();
 
             // Flame peaks with smooth animated swaying
-            const sway1 = Math.sin(f * 1.25) * 3;
-            const sway2 = Math.cos(f * 1.5) * 4;
-            const sway3 = Math.sin(f * 1.8 + 1) * 3;
+            const sway1 = Math.sin((f / 8) * Math.PI * 2) * 3.5;
+            const sway2 = Math.cos((f / 8) * Math.PI * 2 + 0.8) * 4.5;
+            const sway3 = Math.sin((f / 8) * Math.PI * 2 + 1.8) * 3.5;
 
             // Outer Crimson / Orange Flame (Smooth Bezier curves)
-            const outerGrad = ctx.createLinearGradient(0, 40, 0, 4);
+            const outerGrad = ctx.createLinearGradient(0, 40, 0, 2);
             outerGrad.addColorStop(0, '#ff1a00');
-            outerGrad.addColorStop(0.6, '#ff6600');
-            outerGrad.addColorStop(1, 'rgba(255, 140, 0, 0)');
+            outerGrad.addColorStop(0.5, '#ff5500');
+            outerGrad.addColorStop(0.9, '#ff9900');
+            outerGrad.addColorStop(1, 'rgba(255, 120, 0, 0)');
             ctx.fillStyle = outerGrad;
             ctx.beginPath();
             ctx.moveTo(2, 40);
-            ctx.bezierCurveTo(4, 28, 8 + sway1, 14, 10 + sway1, 6);
-            ctx.bezierCurveTo(14 + sway1, 16, 17, 24, 20 + sway2, 4);
-            ctx.bezierCurveTo(24 + sway2, 14, 28, 20, 30 + sway3, 8);
+            ctx.bezierCurveTo(4, 28, 8 + sway1, 14, 10 + sway1, 4);
+            ctx.bezierCurveTo(14 + sway1, 16, 17, 24, 20 + sway2, 2);
+            ctx.bezierCurveTo(24 + sway2, 14, 28, 20, 30 + sway3, 6);
             ctx.bezierCurveTo(34, 18, 38, 28, 38, 40);
             ctx.closePath();
             ctx.fill();
 
             // Mid Golden / Yellow Flame
-            const midGrad = ctx.createLinearGradient(0, 40, 0, 10);
-            midGrad.addColorStop(0, '#ff8800');
-            midGrad.addColorStop(0.7, '#ffcc00');
+            const midGrad = ctx.createLinearGradient(0, 40, 0, 8);
+            midGrad.addColorStop(0, '#ff7700');
+            midGrad.addColorStop(0.65, '#ffcc00');
             midGrad.addColorStop(1, 'rgba(255, 240, 100, 0)');
             ctx.fillStyle = midGrad;
             ctx.beginPath();
             ctx.moveTo(6, 40);
-            ctx.bezierCurveTo(8, 28, 12 + sway1, 18, 14 + sway1, 12);
-            ctx.bezierCurveTo(18, 20, 20 + sway2, 16, 22 + sway2, 10);
-            ctx.bezierCurveTo(26, 18, 30 + sway3, 22, 32, 26);
+            ctx.bezierCurveTo(8, 28, 12 + sway1, 18, 14 + sway1, 10);
+            ctx.bezierCurveTo(18, 20, 20 + sway2, 16, 22 + sway2, 8);
+            ctx.bezierCurveTo(26, 18, 30 + sway3, 22, 32, 24);
             ctx.bezierCurveTo(34, 32, 34, 36, 34, 40);
             ctx.closePath();
             ctx.fill();
 
             // Searing White Core (Intense Heat)
-            const coreGrad = ctx.createRadialGradient(20, 34, 2, 20, 34, 12);
+            const coreGrad = ctx.createRadialGradient(20 + sway2 * 0.4, 32, 2, 20 + sway2 * 0.4, 32, 13);
             coreGrad.addColorStop(0, '#ffffff');
-            coreGrad.addColorStop(0.5, '#ffffaa');
-            coreGrad.addColorStop(1, 'rgba(255, 200, 0, 0)');
+            coreGrad.addColorStop(0.45, '#ffffaa');
+            coreGrad.addColorStop(1, 'rgba(255, 180, 0, 0)');
             ctx.fillStyle = coreGrad;
             ctx.beginPath();
-            ctx.ellipse(20 + sway2 * 0.5, 32, 10, 8, 0, 0, Math.PI * 2);
+            ctx.ellipse(20 + sway2 * 0.4, 32, 11, 8, 0, 0, Math.PI * 2);
             ctx.fill();
 
             // Glowing Floating Embers
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
-            ctx.arc(10 + (f * 5) % 20, 10 + (f * 4) % 15, 1.5, 0, Math.PI * 2);
-            ctx.arc(22 + (f * 3) % 16, 6 + (f * 6) % 12, 1.2, 0, Math.PI * 2);
+            ctx.arc(8 + ((f * 6) % 24), 8 + ((f * 5) % 18), 1.6, 0, Math.PI * 2);
+            ctx.arc(20 + ((f * 4) % 18), 5 + ((f * 7) % 15), 1.3, 0, Math.PI * 2);
+            ctx.arc(28 + ((f * 5 + 3) % 10), 12 + ((f * 3) % 16), 1.4, 0, Math.PI * 2);
             ctx.fill();
 
             this.textures.addCanvas(`fire-${f}`, c);
@@ -506,198 +520,548 @@ export class Preloader extends Phaser.Scene {
     }
 
     private generateHDCharacter(charId: string) {
-        // Generates High-Resolution Smooth Illustrated Character (36x58)
-        const drawHD = (ctx: CanvasRenderingContext2D, legState: number, isJumping: boolean, isJetpacking: boolean) => {
-            ctx.clearRect(0, 0, 36, 58);
+        // High-Definition Smooth Illustrated Character (48x62 Canvas)
+        // Supports full 4-frame animated walk cycle, shoulder-slung weapon, forward shooting stance, and active jetpack thrusters.
+        type Pose = 'idle' | 'walk0' | 'walk1' | 'walk2' | 'walk3' | 'jump' | 'shoot';
+
+        const drawHD = (
+            ctx: CanvasRenderingContext2D,
+            pose: Pose,
+            hasGun: boolean,
+            hasJetpack: boolean,
+            isJetpacking: boolean
+        ) => {
+            ctx.clearRect(0, 0, 48, 62);
+
+            const cx = 24; // Character horizontal center
+
+            // Dynamic head / body bob for responsive walking feel
+            let headBob = 0;
+            if (pose === 'walk0' || pose === 'walk2') headBob = 1;      // Downbeat of stride
+            if (pose === 'walk1' || pose === 'walk3') headBob = -1;     // Upbeat / passing step
+            if (pose === 'jump') headBob = -2;                         // Extended in air
+
+            // -------------------------------------------------------------
+            // LAYER 1: BACK ATTACHMENTS (Jetpack & Shoulder-Mounted Weapon)
+            // -------------------------------------------------------------
+            if (hasJetpack) {
+                // Titanium Dual Ion Thruster Harness on back
+                ctx.fillStyle = '#1e293b';
+                ctx.beginPath();
+                ctx.roundRect(8, 24 + headBob, 9, 20, 3);
+                ctx.fill();
+
+                // Cyan Energy Level Cells
+                ctx.fillStyle = '#00ffff';
+                ctx.shadowColor = '#00ffff';
+                ctx.shadowBlur = 4;
+                ctx.fillRect(10, 27 + headBob, 5, 13);
+                ctx.shadowBlur = 0;
+
+                // Thruster Nozzle
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(9, 44 + headBob, 7, 4);
+
+                // Active Ion Thruster Flames when flying
+                if (isJetpacking) {
+                    const jetGrad = ctx.createLinearGradient(0, 48 + headBob, 0, 60 + headBob);
+                    jetGrad.addColorStop(0, '#ffffff');
+                    jetGrad.addColorStop(0.3, '#00ffff');
+                    jetGrad.addColorStop(0.8, '#0055ff');
+                    jetGrad.addColorStop(1, 'rgba(0, 100, 255, 0)');
+                    ctx.fillStyle = jetGrad;
+                    ctx.shadowColor = '#00ffff';
+                    ctx.shadowBlur = 8;
+                    ctx.beginPath();
+                    ctx.moveTo(8, 48 + headBob);
+                    ctx.lineTo(17, 48 + headBob);
+                    ctx.lineTo(12.5, 60 + headBob);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            }
+
+            // Weapon carried slung over shoulder (when player has gun and is NOT actively shooting)
+            if (hasGun && pose !== 'shoot') {
+                ctx.save();
+                // Angled gun body resting over right shoulder
+                ctx.translate(26, 26 + headBob);
+                ctx.rotate(-0.55); // Angled upward behind shoulder
+
+                // Gun stock and chassis
+                ctx.fillStyle = '#1e293b';
+                ctx.beginPath();
+                ctx.roundRect(-4, -18, 7, 24, 2);
+                ctx.fill();
+
+                // Glowing Cyan Plasma Chamber
+                ctx.fillStyle = '#00ffff';
+                ctx.shadowColor = '#00ffff';
+                ctx.shadowBlur = 4;
+                ctx.fillRect(-2, -14, 3, 10);
+                ctx.shadowBlur = 0;
+
+                // Holographic Sight
+                ctx.fillStyle = '#00ff88';
+                ctx.fillRect(3, -12, 3, 4);
+
+                // Muzzle Emitter
+                ctx.fillStyle = '#475569';
+                ctx.fillRect(-3, -23, 5, 5);
+
+                ctx.restore();
+            }
+
+            // -------------------------------------------------------------
+            // LAYER 2: LEGS & FEET (4-Frame Stride Cycle)
+            // -------------------------------------------------------------
+            const drawLegs = () => {
+                let pantColor = '#1e293b';
+                let shoeColor = '#00ffff';
+                let shoeSole = '#ffffff';
+
+                if (charId === 'daisy-hacker') {
+                    pantColor = '#18181b';
+                    shoeColor = '#ff0077';
+                    shoeSole = '#3f3f46';
+                } else if (charId === 'classic-dave') {
+                    pantColor = '#1e3a8a';
+                    shoeColor = '#78350f';
+                    shoeSole = '#292524';
+                }
+
+                ctx.fillStyle = pantColor;
+                ctx.strokeStyle = '#050510';
+                ctx.lineWidth = 1;
+
+                if (pose === 'jump') {
+                    // Tucked jumping knees
+                    ctx.beginPath();
+                    ctx.roundRect(16, 41, 6, 9, 2);
+                    ctx.roundRect(26, 41, 6, 9, 2);
+                    ctx.fill(); ctx.stroke();
+
+                    // Shoes angled down
+                    ctx.fillStyle = shoeColor;
+                    ctx.beginPath();
+                    ctx.roundRect(14, 49, 9, 5, 2);
+                    ctx.roundRect(26, 49, 9, 5, 2);
+                    ctx.fill();
+                    ctx.fillStyle = shoeSole;
+                    ctx.fillRect(14, 53, 9, 2); ctx.fillRect(26, 53, 9, 2);
+
+                } else if (pose === 'walk0') {
+                    // Left leg forward stride, Right leg pushed back
+                    ctx.beginPath();
+                    ctx.roundRect(25, 41, 6, 11, 2); // Forward leg
+                    ctx.roundRect(16, 41, 6, 9, 2);  // Back leg
+                    ctx.fill(); ctx.stroke();
+
+                    ctx.fillStyle = shoeColor;
+                    ctx.beginPath();
+                    ctx.roundRect(27, 51, 10, 6, [2, 2, 0, 0]); // Forward shoe
+                    ctx.roundRect(11, 49, 9, 6, [2, 2, 0, 0]);  // Back shoe (heel lifted)
+                    ctx.fill();
+                    ctx.fillStyle = shoeSole;
+                    ctx.fillRect(27, 55, 10, 2); ctx.fillRect(11, 53, 9, 2);
+
+                } else if (pose === 'walk1' || pose === 'walk3') {
+                    // Passing midstep (legs centered, knees passing)
+                    ctx.beginPath();
+                    ctx.roundRect(19, 41, 5.5, 13, 2);
+                    ctx.roundRect(24.5, 41, 5.5, 13, 2);
+                    ctx.fill(); ctx.stroke();
+
+                    ctx.fillStyle = shoeColor;
+                    ctx.beginPath();
+                    ctx.roundRect(16, 53, 9, 6, [2, 2, 0, 0]);
+                    ctx.roundRect(24, 53, 9, 6, [2, 2, 0, 0]);
+                    ctx.fill();
+                    ctx.fillStyle = shoeSole;
+                    ctx.fillRect(16, 57, 9, 2); ctx.fillRect(24, 57, 9, 2);
+
+                } else if (pose === 'walk2') {
+                    // Right leg forward stride, Left leg pushed back
+                    ctx.beginPath();
+                    ctx.roundRect(17, 41, 6, 9, 2);  // Back leg
+                    ctx.roundRect(25, 41, 6, 11, 2); // Forward leg
+                    ctx.fill(); ctx.stroke();
+
+                    ctx.fillStyle = shoeColor;
+                    ctx.beginPath();
+                    ctx.roundRect(11, 49, 9, 6, [2, 2, 0, 0]);  // Back shoe
+                    ctx.roundRect(27, 51, 10, 6, [2, 2, 0, 0]); // Forward shoe
+                    ctx.fill();
+                    ctx.fillStyle = shoeSole;
+                    ctx.fillRect(11, 53, 9, 2); ctx.fillRect(27, 55, 10, 2);
+
+                } else if (pose === 'shoot') {
+                    // Wide stable shooting stance
+                    ctx.beginPath();
+                    ctx.roundRect(16, 41, 6, 13, 2);
+                    ctx.roundRect(27, 41, 6, 13, 2);
+                    ctx.fill(); ctx.stroke();
+
+                    ctx.fillStyle = shoeColor;
+                    ctx.beginPath();
+                    ctx.roundRect(13, 53, 10, 6, [2, 2, 0, 0]);
+                    ctx.roundRect(27, 53, 10, 6, [2, 2, 0, 0]);
+                    ctx.fill();
+                    ctx.fillStyle = shoeSole;
+                    ctx.fillRect(13, 57, 10, 2); ctx.fillRect(27, 57, 10, 2);
+
+                } else {
+                    // Idle standing
+                    ctx.beginPath();
+                    ctx.roundRect(18, 41, 6, 13, 2);
+                    ctx.roundRect(25, 41, 6, 13, 2);
+                    ctx.fill(); ctx.stroke();
+
+                    ctx.fillStyle = shoeColor;
+                    ctx.beginPath();
+                    ctx.roundRect(15, 53, 9, 6, [2, 2, 0, 0]);
+                    ctx.roundRect(25, 53, 9, 6, [2, 2, 0, 0]);
+                    ctx.fill();
+                    ctx.fillStyle = shoeSole;
+                    ctx.fillRect(15, 57, 9, 2); ctx.fillRect(25, 57, 9, 2);
+                }
+            };
+            drawLegs();
+
+            // -------------------------------------------------------------
+            // LAYER 3: TORSO & STREETWEAR / TECH CLOTHING
+            // -------------------------------------------------------------
+            ctx.save();
+            ctx.strokeStyle = '#050510';
+            ctx.lineWidth = 1;
 
             if (charId === 'cyber-dave') {
-                // ==============================================
-                // CYBER DAVE (Modern Gen Z Streamer / Gamer)
-                // RGB Headset, backward cap, hoodie, high-tops
-                // ==============================================
-                // Head / Face
-                ctx.fillStyle = '#f6d5be';
-                ctx.beginPath(); ctx.ellipse(18, 18, 9, 10, 0, 0, Math.PI * 2); ctx.fill();
+                // Streetwear Oversized Purple/Black Hoodie
+                const hoodieGrad = ctx.createLinearGradient(0, 24 + headBob, 0, 42 + headBob);
+                hoodieGrad.addColorStop(0, '#4c1d95');
+                hoodieGrad.addColorStop(1, '#2e1065');
+                ctx.fillStyle = hoodieGrad;
+                ctx.beginPath();
+                ctx.roundRect(15, 24 + headBob, 19, 18, 3);
+                ctx.fill(); ctx.stroke();
 
-                // Backward Streetwear Cap (Charcoal & Cyan)
-                ctx.fillStyle = '#0f172a';
-                ctx.beginPath(); ctx.roundRect(8, 7, 20, 9, [6, 6, 2, 2]); ctx.fill();
+                // Neon cyan chest graphic & drawstrings
                 ctx.fillStyle = '#00ffff';
-                ctx.beginPath(); ctx.roundRect(4, 12, 6, 3, 2); ctx.fill(); // Backward visor bill
+                ctx.fillRect(22, 27 + headBob, 1.5, 9);
+                ctx.fillRect(25, 27 + headBob, 1.5, 9);
+                ctx.fillRect(21, 37 + headBob, 6, 1.5);
 
-                // RGB Gaming Headphones
-                ctx.strokeStyle = '#00ff88'; ctx.lineWidth = 2.5;
-                ctx.beginPath(); ctx.arc(18, 12, 11, Math.PI, 0); ctx.stroke();
-                // Earcups with glowing neon LEDs
-                ctx.fillStyle = '#ff0077'; ctx.shadowColor = '#ff0077'; ctx.shadowBlur = 6;
-                ctx.beginPath(); ctx.roundRect(6, 12, 4, 9, 2); ctx.roundRect(26, 12, 4, 9, 2); ctx.fill();
+            } else if (charId === 'daisy-hacker') {
+                // Obsidian Cyber-Suit with Neon Magenta Trims
+                ctx.fillStyle = '#18181b';
+                ctx.beginPath();
+                ctx.roundRect(16, 24 + headBob, 17, 18, 3);
+                ctx.fill(); ctx.stroke();
+
+                ctx.fillStyle = '#ff0077';
+                ctx.fillRect(23, 25 + headBob, 2, 16);
+                ctx.fillRect(19, 32 + headBob, 11, 2);
+
+            } else {
+                // Classic Dave Blue Adventure Jacket & White Belt
+                ctx.fillStyle = '#2563eb';
+                ctx.beginPath();
+                ctx.roundRect(15, 24 + headBob, 18, 18, 3);
+                ctx.fill(); ctx.stroke();
+
+                // White collar
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.moveTo(21, 24 + headBob); ctx.lineTo(24, 28 + headBob); ctx.lineTo(27, 24 + headBob);
+                ctx.fill();
+
+                // White Belt & Gold Buckle
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(15, 38 + headBob, 18, 3);
+                ctx.fillStyle = '#eab308';
+                ctx.fillRect(22, 37.5 + headBob, 4, 4);
+            }
+
+            // Diagonal gun holster strap across chest (when carrying gun)
+            if (hasGun && pose !== 'shoot') {
+                ctx.strokeStyle = '#0f172a';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(17, 25 + headBob);
+                ctx.lineTo(31, 41 + headBob);
+                ctx.stroke();
+                ctx.strokeStyle = '#00ffff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // -------------------------------------------------------------
+            // LAYER 4: HEAD, FACE, EYEWEAR & HEADWEAR
+            // -------------------------------------------------------------
+            ctx.save();
+            const headY = 16 + headBob;
+
+            // Skin Tone Face
+            ctx.fillStyle = '#f6d5be';
+            ctx.strokeStyle = '#050510';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.ellipse(cx, headY, 8.5, 9.5, 0, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+
+            if (charId === 'cyber-dave') {
+                // Backward Streetwear Cap (Charcoal with cyan backward bill)
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.roundRect(15, headY - 10, 19, 9, [5, 5, 2, 2]);
+                ctx.fill(); ctx.stroke();
+                // Backward bill pointing left
+                ctx.fillStyle = '#00ffff';
+                ctx.beginPath();
+                ctx.roundRect(11, headY - 5, 5, 3.5, 2);
+                ctx.fill();
+
+                // RGB Gaming Headset arch over cap
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(cx, headY - 4, 11, Math.PI, 0);
+                ctx.stroke();
+
+                // Neon LED Earcups
+                ctx.fillStyle = '#ff0077';
+                ctx.shadowColor = '#ff0077';
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                ctx.roundRect(13, headY - 3, 3.5, 8, 2);
+                ctx.roundRect(31, headY - 3, 3.5, 8, 2);
+                ctx.fill();
                 ctx.shadowBlur = 0;
 
                 // Dark Cyber Sunglasses
                 ctx.fillStyle = '#020617';
-                ctx.beginPath(); ctx.roundRect(11, 16, 14, 4, 2); ctx.fill();
+                ctx.beginPath();
+                ctx.roundRect(18, headY - 1, 13, 4.5, 2);
+                ctx.fill();
                 ctx.fillStyle = '#00ffff';
-                ctx.fillRect(13, 17, 8, 1); // Visor reflection
-
-                // Streetwear Hoodie (Deep Purple / Neon Cyan Accents)
-                const hoodieGrad = ctx.createLinearGradient(0, 24, 0, 42);
-                hoodieGrad.addColorStop(0, '#3b0764'); hoodieGrad.addColorStop(1, '#2e0854');
-                ctx.fillStyle = hoodieGrad;
-                ctx.beginPath(); ctx.roundRect(9, 24, 18, 17, [4, 4, 2, 2]); ctx.fill();
-                // Neon drawstring
-                ctx.fillStyle = '#00ffff'; ctx.fillRect(16, 26, 1.5, 9); ctx.fillRect(19, 26, 1.5, 9);
-
-                // Arms / Gloves
-                ctx.fillStyle = '#3b0764';
-                ctx.fillRect(5, 26, 4, 10); ctx.fillRect(27, 26, 4, 10);
-                ctx.fillStyle = '#0f172a'; // Black gaming gloves
-                ctx.fillRect(5, 36, 4, 5); ctx.fillRect(27, 36, 4, 5);
-
-                // Jogger Pants
-                ctx.fillStyle = '#1e293b';
-                if (isJumping) {
-                    ctx.fillRect(8, 41, 7, 7); ctx.fillRect(21, 41, 7, 7);
-                    // High-top Neon Sneakers
-                    ctx.fillStyle = '#00ffff';
-                    ctx.beginPath(); ctx.roundRect(6, 48, 9, 6, [2, 2, 0, 0]); ctx.roundRect(21, 48, 9, 6, [2, 2, 0, 0]); ctx.fill();
-                    ctx.fillStyle = '#ffffff'; ctx.fillRect(6, 52, 9, 2); ctx.fillRect(21, 52, 9, 2);
-                } else if (legState === 1) {
-                    ctx.fillRect(7, 41, 7, 8); ctx.fillRect(22, 41, 7, 5);
-                    ctx.fillStyle = '#00ffff';
-                    ctx.beginPath(); ctx.roundRect(5, 49, 9, 6, [2, 2, 0, 0]); ctx.roundRect(22, 46, 9, 6, [2, 2, 0, 0]); ctx.fill();
-                } else if (legState === 2) {
-                    ctx.fillRect(8, 41, 7, 5); ctx.fillRect(21, 41, 7, 8);
-                    ctx.fillStyle = '#00ffff';
-                    ctx.beginPath(); ctx.roundRect(8, 46, 9, 6, [2, 2, 0, 0]); ctx.roundRect(21, 49, 9, 6, [2, 2, 0, 0]); ctx.fill();
-                } else {
-                    ctx.fillRect(9, 41, 7, 7); ctx.fillRect(20, 41, 7, 7);
-                    ctx.fillStyle = '#00ffff';
-                    ctx.beginPath(); ctx.roundRect(7, 48, 9, 6, [2, 2, 0, 0]); ctx.roundRect(20, 48, 9, 6, [2, 2, 0, 0]); ctx.fill();
-                    ctx.fillStyle = '#ffffff'; ctx.fillRect(7, 52, 9, 2); ctx.fillRect(20, 52, 9, 2);
-                }
+                ctx.fillRect(20, headY, 7, 1); // Specular lens reflection
 
             } else if (charId === 'daisy-hacker') {
-                // ==============================================
-                // DAISY VEX (Cyberpunk Tech Hacker)
-                // Neon Pink Undercut, Visor, Chrome Cyber Arm
-                // ==============================================
-                // Head
-                ctx.fillStyle = '#f6d5be';
-                ctx.beginPath(); ctx.ellipse(18, 17, 8, 9, 0, 0, Math.PI * 2); ctx.fill();
-
                 // Neon Magenta Undercut Hairstyle
-                ctx.fillStyle = '#18181b'; ctx.fillRect(9, 8, 6, 9); // Shaved side
+                ctx.fillStyle = '#18181b';
+                ctx.fillRect(15, headY - 9, 6, 8); // Shaved side
                 ctx.fillStyle = '#ff0077';
                 ctx.beginPath();
-                ctx.moveTo(12, 7); ctx.bezierCurveTo(20, 2, 28, 6, 28, 16); ctx.lineTo(26, 24); ctx.lineTo(20, 16);
+                ctx.moveTo(17, headY - 10);
+                ctx.bezierCurveTo(25, headY - 15, 33, headY - 8, 33, headY + 3);
+                ctx.lineTo(29, headY + 9);
+                ctx.lineTo(25, headY);
                 ctx.closePath();
                 ctx.fill();
 
-                // Holographic AR Eyepiece
-                ctx.fillStyle = '#00ffcc'; ctx.shadowColor = '#00ffcc'; ctx.shadowBlur = 6;
-                ctx.beginPath(); ctx.roundRect(16, 15, 9, 4, 2); ctx.fill(); ctx.shadowBlur = 0;
-                ctx.fillStyle = '#ffffff'; ctx.fillRect(18, 16, 4, 1.5);
-
-                // High-Tech Cyber Suit (Obsidian + Pink Neon Lines)
-                ctx.fillStyle = '#18181b';
-                ctx.beginPath(); ctx.roundRect(10, 24, 16, 17, 3); ctx.fill();
-                ctx.fillStyle = '#ff0077'; ctx.fillRect(17, 25, 2, 15);
-
-                // Cybernetic Left Arm (Chrome + Cyan Circuit lines)
-                ctx.fillStyle = '#cbd5e1'; ctx.fillRect(5, 26, 4, 12);
-                ctx.fillStyle = '#00ffff'; ctx.fillRect(6, 30, 2, 4);
-                // Right Arm
-                ctx.fillStyle = '#f6d5be'; ctx.fillRect(27, 26, 4, 12);
-
-                // Combat Boots
-                ctx.fillStyle = '#27272a';
-                if (isJumping) {
-                    ctx.fillRect(9, 41, 6, 7); ctx.fillRect(21, 41, 6, 7);
-                    ctx.fillStyle = '#ff0077'; ctx.fillRect(7, 48, 8, 6); ctx.fillRect(21, 48, 8, 6);
-                } else if (legState === 1) {
-                    ctx.fillRect(8, 41, 6, 8); ctx.fillRect(22, 41, 6, 5);
-                    ctx.fillStyle = '#ff0077'; ctx.fillRect(6, 49, 8, 6); ctx.fillRect(22, 46, 8, 6);
-                } else {
-                    ctx.fillRect(10, 41, 6, 7); ctx.fillRect(20, 41, 6, 7);
-                    ctx.fillStyle = '#ff0077'; ctx.fillRect(8, 48, 8, 6); ctx.fillRect(20, 48, 8, 6);
-                }
+                // Glowing Holographic Eye-Visor
+                ctx.fillStyle = '#00ffcc';
+                ctx.shadowColor = '#00ffcc';
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                ctx.roundRect(22, headY - 2, 9, 4.5, 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(24, headY - 1, 4, 1.5);
 
             } else {
-                // ==============================================
-                // CLASSIC DAVE (Remastered Illustrated Edition)
-                // Red Cap, Blue Jacket, White Belt, Boots
-                // ==============================================
-                // Head
-                ctx.fillStyle = '#f6d5be';
-                ctx.beginPath(); ctx.ellipse(18, 18, 8, 9, 0, 0, Math.PI * 2); ctx.fill();
-
-                // Red Baseball Cap
+                // Classic Dave Remastered Red Cap
                 ctx.fillStyle = '#dc2626';
-                ctx.beginPath(); ctx.roundRect(9, 8, 18, 8, [6, 6, 2, 2]); ctx.fill();
-                ctx.fillRect(14, 14, 12, 3); // Cap bill
-                ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(17, 12, 2.5, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath();
+                ctx.roundRect(15, headY - 10, 18, 9, [6, 6, 2, 2]);
+                ctx.fill(); ctx.stroke();
+                // Forward red visor bill
+                ctx.beginPath();
+                ctx.roundRect(23, headY - 3, 10, 3.5, 2);
+                ctx.fill(); ctx.stroke();
+                // White Cap Emblem
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(22, headY - 6, 2.5, 0, Math.PI * 2);
+                ctx.fill();
 
-                // Hair & Eye
-                ctx.fillStyle = '#451a03'; ctx.fillRect(10, 14, 4, 5);
-                ctx.fillStyle = '#0f172a'; ctx.fillRect(21, 16, 3, 3);
+                // Eyes & Hair
+                ctx.fillStyle = '#451a03'; ctx.fillRect(16, headY - 2, 4, 5);
+                ctx.fillStyle = '#0f172a'; ctx.fillRect(26, headY - 2, 3, 3);
+            }
+            ctx.restore();
 
-                // Blue Jacket & Belt
-                ctx.fillStyle = '#2563eb';
-                ctx.beginPath(); ctx.roundRect(10, 24, 16, 17, 3); ctx.fill();
-                ctx.fillStyle = '#ffffff'; ctx.fillRect(10, 36, 16, 3); // Belt
-                ctx.fillStyle = '#eab308'; ctx.fillRect(16, 36, 4, 3); // Buckle
+            // -------------------------------------------------------------
+            // LAYER 5: ARMS, WEAPONS & FIRING STANCE
+            // -------------------------------------------------------------
+            ctx.save();
+            let armSleeveColor = '#3b0764';
+            let armHandColor = '#0f172a'; // Black gaming gloves
 
-                // Arms
-                ctx.fillStyle = '#2563eb'; ctx.fillRect(6, 25, 4, 11); ctx.fillRect(26, 25, 4, 11);
-                ctx.fillStyle = '#f6d5be'; ctx.fillRect(6, 36, 4, 4); ctx.fillRect(26, 36, 4, 4);
-
-                // Jeans & Leather Boots
-                ctx.fillStyle = '#1e3a8a';
-                if (isJumping) {
-                    ctx.fillRect(9, 41, 6, 7); ctx.fillRect(21, 41, 6, 7);
-                    ctx.fillStyle = '#78350f'; ctx.fillRect(7, 48, 8, 6); ctx.fillRect(21, 48, 8, 6);
-                } else if (legState === 1) {
-                    ctx.fillRect(8, 41, 6, 8); ctx.fillRect(22, 41, 6, 5);
-                    ctx.fillStyle = '#78350f'; ctx.fillRect(6, 49, 8, 6); ctx.fillRect(22, 46, 8, 6);
-                } else {
-                    ctx.fillRect(10, 41, 6, 7); ctx.fillRect(20, 41, 6, 7);
-                    ctx.fillStyle = '#78350f'; ctx.fillRect(8, 48, 8, 6); ctx.fillRect(20, 48, 8, 6);
-                }
+            if (charId === 'daisy-hacker') {
+                armSleeveColor = '#18181b';
+                armHandColor = '#cbd5e1'; // Chrome cyber hand
+            } else if (charId === 'classic-dave') {
+                armSleeveColor = '#2563eb';
+                armHandColor = '#f6d5be'; // Natural hand
             }
 
-            // Ion Jetpack Flames when flying
-            if (isJetpacking) {
-                const jetGrad = ctx.createLinearGradient(0, 24, 0, 48);
-                jetGrad.addColorStop(0, '#00ffff');
-                jetGrad.addColorStop(0.5, '#0077ff');
-                jetGrad.addColorStop(1, 'rgba(0, 150, 255, 0)');
-                ctx.fillStyle = jetGrad;
+            if (pose === 'shoot') {
+                // =========================================================
+                // FORWARD AIMING & SHOOTING STANCE WITH PLASMA RIFLE
+                // =========================================================
+                // Left Arm reaching forward under barrel
+                ctx.fillStyle = armSleeveColor;
                 ctx.beginPath();
-                ctx.ellipse(3, 40, 3.5, 9, 0, 0, Math.PI * 2);
+                ctx.roundRect(19, 26 + headBob, 11, 5, 2);
+                ctx.fill();
+                ctx.fillStyle = armHandColor;
+                ctx.beginPath();
+                ctx.roundRect(28, 26 + headBob, 4, 5, 2);
+                ctx.fill();
+
+                // High-Tech Plasma Rifle (Extending forward)
+                ctx.fillStyle = '#1e293b';
+                ctx.beginPath();
+                ctx.roundRect(24, 25 + headBob, 18, 7, 2); // Main receiver
+                ctx.fill();
+
+                // Glowing Cyan Plasma Chamber
+                ctx.fillStyle = '#00ffff';
+                ctx.shadowColor = '#00ffff';
+                ctx.shadowBlur = 8;
+                ctx.fillRect(28, 27 + headBob, 8, 3);
+                ctx.shadowBlur = 0;
+
+                // Holographic Sight
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(29, 21 + headBob, 6, 4);
+
+                // Barrel & Laser Emitter tip
+                ctx.fillStyle = '#475569';
+                ctx.fillRect(41, 26.5 + headBob, 5, 4);
+
+                // Energetic Muzzle Flash Flare
+                ctx.fillStyle = '#00ffff';
+                ctx.shadowColor = '#00ffff';
+                ctx.shadowBlur = 12;
+                ctx.beginPath();
+                ctx.arc(46, 28.5 + headBob, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(46, 28.5 + headBob, 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Right Hand gripping trigger
+                ctx.fillStyle = armSleeveColor;
+                ctx.beginPath();
+                ctx.roundRect(17, 28 + headBob, 8, 5, 2);
+                ctx.fill();
+                ctx.fillStyle = armHandColor;
+                ctx.beginPath();
+                ctx.roundRect(23, 28 + headBob, 4, 5, 2);
+                ctx.fill();
+
+            } else {
+                // =========================================================
+                // DYNAMIC ARM SWING WITH WALKING CYCLE
+                // =========================================================
+                let leftArmY = 26 + headBob;
+                let rightArmY = 26 + headBob;
+                let leftArmX = 11;
+                let rightArmX = 31;
+
+                if (pose === 'walk0') {
+                    // Left arm swings back, right arm swings forward
+                    leftArmX = 9; leftArmY = 27 + headBob;
+                    rightArmX = 33; rightArmY = 27 + headBob;
+                } else if (pose === 'walk2') {
+                    // Right arm swings back, left arm swings forward
+                    leftArmX = 13; leftArmY = 27 + headBob;
+                    rightArmX = 29; rightArmY = 27 + headBob;
+                } else if (pose === 'jump') {
+                    // Arms raised slightly for balance
+                    leftArmX = 9; leftArmY = 23 + headBob;
+                    rightArmX = 33; rightArmY = 23 + headBob;
+                }
+
+                // Left Arm (Back)
+                ctx.fillStyle = armSleeveColor;
+                ctx.beginPath();
+                ctx.roundRect(leftArmX, leftArmY, 5, 11, 2);
+                ctx.fill();
+                ctx.fillStyle = armHandColor;
+                ctx.beginPath();
+                ctx.roundRect(leftArmX, leftArmY + 11, 5, 4, 2);
+                ctx.fill();
+
+                // Right Arm (Front)
+                ctx.fillStyle = armSleeveColor;
+                ctx.beginPath();
+                ctx.roundRect(rightArmX, rightArmY, 5, 11, 2);
+                ctx.fill();
+                ctx.fillStyle = armHandColor;
+                ctx.beginPath();
+                ctx.roundRect(rightArmX, rightArmY + 11, 5, 4, 2);
                 ctx.fill();
             }
+            ctx.restore();
         };
 
-        // Render Idle, Walk1, Walk2, Jump, Jetpack in 36x58
-        let c = document.createElement('canvas'); c.width = 36; c.height = 58;
-        let ctx = c.getContext('2d')!;
-        drawHD(ctx, 0, false, false);
-        this.textures.addCanvas(`${charId}-idle`, c);
+        // Render all permutations of gear & animation states for this character (48x62)
+        const gearTags: { tag: string; hasGun: boolean; hasJet: boolean }[] = [
+            { tag: '', hasGun: false, hasJet: false },
+            { tag: '-gun', hasGun: true, hasJet: false },
+            { tag: '-jet', hasGun: false, hasJet: true },
+            { tag: '-gunjet', hasGun: true, hasJet: true },
+        ];
 
-        c = document.createElement('canvas'); c.width = 36; c.height = 58; ctx = c.getContext('2d')!;
-        drawHD(ctx, 1, false, false);
-        this.textures.addCanvas(`${charId}-walk1`, c);
+        const poses: Pose[] = ['idle', 'walk0', 'walk1', 'walk2', 'walk3', 'jump', 'shoot'];
 
-        c = document.createElement('canvas'); c.width = 36; c.height = 58; ctx = c.getContext('2d')!;
-        drawHD(ctx, 2, false, false);
-        this.textures.addCanvas(`${charId}-walk2`, c);
+        for (const gear of gearTags) {
+            for (const p of poses) {
+                // Skip shoot pose if player doesn't have gun
+                if (p === 'shoot' && !gear.hasGun) continue;
 
-        c = document.createElement('canvas'); c.width = 36; c.height = 58; ctx = c.getContext('2d')!;
-        drawHD(ctx, 0, true, false);
-        this.textures.addCanvas(`${charId}-jump`, c);
+                const c = document.createElement('canvas');
+                c.width = 48;
+                c.height = 62;
+                const ctx = c.getContext('2d')!;
+                drawHD(ctx, p, gear.hasGun, gear.hasJet, false);
 
-        c = document.createElement('canvas'); c.width = 36; c.height = 58; ctx = c.getContext('2d')!;
-        drawHD(ctx, 0, true, true);
-        this.textures.addCanvas(`${charId}-jetpack`, c);
+                const key = `${charId}${gear.tag}-${p}`;
+                this.textures.addCanvas(key, c);
+            }
+
+            // If gear has jetpack, also generate the active thruster flight frame
+            if (gear.hasJet) {
+                const c = document.createElement('canvas');
+                c.width = 48;
+                c.height = 62;
+                const ctx = c.getContext('2d')!;
+                drawHD(ctx, 'jump', gear.hasGun, true, true);
+                this.textures.addCanvas(`${charId}${gear.tag}-flight`, c);
+            }
+        }
+
+        // Backward-compatibility aliases for legacy scene calls
+        const aliasMap: { [from: string]: string } = {
+            [`${charId}-walk1`]: `${charId}-walk0`,
+            [`${charId}-walk2`]: `${charId}-walk2`,
+            [`${charId}-jetpack`]: `${charId}-jet-flight`
+        };
+
+        for (const [fromKey, toKey] of Object.entries(aliasMap)) {
+            if (!this.textures.exists(fromKey) && this.textures.exists(toKey)) {
+                const src = this.textures.get(toKey).getSourceImage() as HTMLCanvasElement;
+                if (src) this.textures.addCanvas(fromKey, src);
+            }
+        }
     }
 }
