@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { drawHDCharacter, Pose } from '../utils/CharacterRenderer';
 
 export class Preloader extends Phaser.Scene {
     constructor() {
@@ -517,15 +518,18 @@ export class Preloader extends Phaser.Scene {
         c = document.createElement('canvas'); c.width = 10; c.height = 10; ctx = c.getContext('2d')!;
         ctx.fillStyle = '#00b4d8'; ctx.beginPath(); ctx.arc(5, 5, 5, 0, Math.PI*2); ctx.fill();
         this.textures.addCanvas('particle-smoke', c);
-    }
+            ctx.fillStyle = '#00b4d8'; ctx.beginPath(); ctx.arc(5, 5, 5, 0, Math.PI*2); ctx.fill();
+            this.textures.addCanvas('particle-smoke', c);
+        }
 
     private generateHDCharacter(charId: string) {
         // High-Definition Smooth Illustrated Character (48x62 Canvas)
         // Supports full 4-frame animated walk cycle, shoulder-slung weapon, forward shooting stance, and active jetpack thrusters.
         type Pose = 'idle' | 'walk0' | 'walk1' | 'walk2' | 'walk3' | 'jump' | 'shoot';
 
-        const drawHD = (
+        const drawHDCharacter = (
             ctx: CanvasRenderingContext2D,
+            charId: string,
             pose: Pose,
             hasGun: boolean,
             hasJetpack: boolean,
@@ -1294,7 +1298,7 @@ export class Preloader extends Phaser.Scene {
                 c.width = 48;
                 c.height = 62;
                 const ctx = c.getContext('2d')!;
-                drawHD(ctx, p, gear.hasGun, gear.hasJet, false);
+                drawHDCharacter(ctx, charId, p, gear.hasGun, gear.hasJet, false);
 
                 const key = `${charId}${gear.tag}-${p}`;
                 this.textures.addCanvas(key, c);
@@ -1306,7 +1310,7 @@ export class Preloader extends Phaser.Scene {
                 c.width = 48;
                 c.height = 62;
                 const ctx = c.getContext('2d')!;
-                drawHD(ctx, 'jump', gear.hasGun, true, true);
+                drawHDCharacter(ctx, charId, 'jump', gear.hasGun, true, true);
                 this.textures.addCanvas(`${charId}${gear.tag}-flight`, c);
             }
         }

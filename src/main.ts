@@ -5,6 +5,7 @@ import { GameScene } from './scenes/Game';
 import { SoundManager } from './utils/SoundManager';
 import { LEVELS } from './data/levels';
 import { CharacterManager, CHARACTERS } from './utils/CharacterManager';
+import { renderCharacterShowcase } from './utils/CharacterRenderer';
 
 let currentGame: Phaser.Game;
 
@@ -59,7 +60,43 @@ function initUI(game: Phaser.Game) {
     const btnHudChar = document.getElementById('btn-hud-char');
     const btnCloseCharSelect = document.getElementById('btn-close-character-select');
 
-    // Populate Character Cards Grid
+    let charAnimFrameId: number | null = null;
+
+    const startCharacterShowcaseAnimation = () => {
+        if (charAnimFrameId) cancelAnimationFrame(charAnimFrameId);
+
+        const animate = () => {
+            if (!charSelectModal || charSelectModal.classList.contains('hidden')) {
+                charAnimFrameId = null;
+                return;
+            }
+
+            const canvases = document.querySelectorAll<HTMLCanvasElement>('.character-preview-canvas');
+            const now = performance.now();
+            const currentSelected = CharacterManager.getSelected();
+
+            canvases.forEach((canvas) => {
+                const charId = canvas.getAttribute('data-char');
+                if (charId) {
+                    const isSel = charId === currentSelected.id;
+                    renderCharacterShowcase(canvas, charId, now, isSel);
+                }
+            });
+
+            charAnimFrameId = requestAnimationFrame(animate);
+        };
+
+        charAnimFrameId = requestAnimationFrame(animate);
+    };
+
+    const stopCharacterShowcaseAnimation = () => {
+        if (charAnimFrameId) {
+            cancelAnimationFrame(charAnimFrameId);
+            charAnimFrameId = null;
+        }
+    };
+
+    // Populate Subway Surfers Style Character Cards Grid
     const renderCharacterCards = () => {
         if (!charCardsGrid) return;
         charCardsGrid.innerHTML = '';
@@ -68,25 +105,89 @@ function initUI(game: Phaser.Game) {
         CHARACTERS.forEach((char) => {
             const isSelected = char.id === currentSelected.id;
             const card = document.createElement('div');
-            card.className = `p-4 rounded-lg border-2 cursor-pointer transition-all transform hover:scale-105 flex flex-col items-center text-center ${
-                isSelected ? 'border-cyan-400 bg-cyan-950/60 shadow-[0_0_15px_rgba(0,255,255,0.4)]' : 'border-gray-700 bg-gray-900/60 hover:border-gray-500'
+            card.className = `p-4 rounded-xl border-2 cursor-pointer transition-all transform hover:scale-[1.03] flex flex-col items-center text-center relative ${
+                isSelected
+                    ? 'border-cyan-400 bg-cyan-950/70 shadow-[0_0_25px_rgba(0,255,255,0.4)]'
+                    : 'border-gray-800 bg-gray-900/80 hover:border-gray-600 hover:bg-gray-900'
             }`;
 
             card.innerHTML = `
-                <div class="w-16 h-16 rounded-full bg-gradient-to-br ${char.accentColorHex} flex items-center justify-center mb-3 shadow-lg border-2 border-white/20">
-                    <span class="text-2xl">${char.id === 'daisy-hacker' ? '⚡' : char.id === 'cyber-dave' ? '🎧' : '🧢'}</span>
+                <!-- Top Archetype Badge -->
+                <div class="w-full flex justify-between items-center mb-2">
+                    <span class="text-[7px] font-extrabold uppercase px-2 py-0.5 rounded-full border tracking-widest ${
+                        char.id === 'cyber-dave'
+                            ? 'bg-cyan-950/80 text-cyan-300 border-cyan-400/50'
+                            : char.id === 'daisy-hacker'
+                            ? 'bg-pink-950/80 text-pink-300 border-pink-400/50'
+                            : 'bg-amber-950/80 text-yellow-300 border-amber-400/50'
+                    }">
+                        ${char.badge}
+                    </span>
+                    <span class="text-[8px] font-bold ${isSelected ? 'text-cyan-400' : 'text-gray-500'}">
+                        ${isSelected ? '★ ACTIVE' : ''}
+                    </span>
                 </div>
-                <h3 class="text-xs font-bold text-white mb-1 tracking-wider">${char.name}</h3>
-                <span class="text-[8px] font-bold text-cyan-400 mb-2 uppercase">${char.tagline}</span>
-                <p class="text-[8px] text-gray-300 font-ui leading-tight mb-3">${char.description}</p>
-                <div class="text-[9px] font-bold py-1 px-3 rounded-full ${isSelected ? 'bg-cyan-500 text-black' : 'bg-gray-800 text-gray-400'}">
-                    ${isSelected ? '✓ ACTIVE' : 'SELECT'}
+
+                <!-- Subway Surfers Animated Hero Showcase Stage -->
+                <div class="w-full h-44 rounded-lg overflow-hidden relative mb-2.5 border ${
+                    isSelected
+                        ? 'border-cyan-400/50 bg-gradient-to-b from-cyan-950/50 via-black/80 to-black'
+                        : 'border-white/10 bg-gradient-to-b from-gray-900/60 via-black/80 to-black'
+                }">
+                    <canvas class="character-preview-canvas w-full h-full block" width="160" height="180" data-char="${char.id}"></canvas>
+                    <div class="absolute bottom-1.5 left-2 right-2 flex justify-between items-center pointer-events-none">
+                        <span class="text-[8px] font-bold text-white/90 drop-shadow">${char.name}</span>
+                        <span class="text-[7px] text-yellow-300 font-bold drop-shadow">⚡ ${char.perk}</span>
+                    </div>
                 </div>
+
+                <h3 class="text-xs font-bold text-white mb-0.5 tracking-wider">${char.name}</h3>
+                <span class="text-[8px] font-bold ${
+                    char.id === 'cyber-dave' ? 'text-cyan-400' : char.id === 'daisy-hacker' ? 'text-pink-400' : 'text-amber-400'
+                } mb-1.5 uppercase">${char.tagline}</span>
+                <p class="text-[8px] text-gray-300 font-ui leading-snug mb-3 text-left w-full line-clamp-2">${char.description}</p>
+
+                <!-- Subway Surfers Attribute Stat Bars -->
+                <div class="w-full space-y-1 mb-3 text-[7px] font-bold">
+                    <div class="flex justify-between items-center text-gray-400">
+                        <span>SPEED</span>
+                        <div class="w-24 h-1.5 bg-gray-800 rounded-full overflow-hidden border border-white/10">
+                            <div class="h-full bg-cyan-400 rounded-full" style="width: ${char.stats.speed}%"></div>
+                        </div>
+                        <span class="text-white">${char.stats.speed}%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-gray-400">
+                        <span>JUMP</span>
+                        <div class="w-24 h-1.5 bg-gray-800 rounded-full overflow-hidden border border-white/10">
+                            <div class="h-full bg-yellow-400 rounded-full" style="width: ${char.stats.jump}%"></div>
+                        </div>
+                        <span class="text-white">${char.stats.jump}%</span>
+                    </div>
+                    <div class="flex justify-between items-center text-gray-400">
+                        <span>STYLE</span>
+                        <div class="w-24 h-1.5 bg-gray-800 rounded-full overflow-hidden border border-white/10">
+                            <div class="h-full bg-pink-500 rounded-full" style="width: ${char.stats.style}%"></div>
+                        </div>
+                        <span class="text-white">${char.stats.style}%</span>
+                    </div>
+                </div>
+
+                <!-- Equip Action Button -->
+                <button class="w-full py-2 px-3 rounded-lg font-bold text-[9px] transition-all tracking-wider ${
+                    isSelected
+                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-black shadow-[0_0_15px_rgba(0,255,255,0.6)] font-extrabold cursor-default'
+                        : 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border border-white/20'
+                }">
+                    ${isSelected ? '✓ EQUIPPED' : 'SELECT HERO'}
+                </button>
             `;
 
             card.addEventListener('click', () => {
+                SoundManager.playGem();
                 CharacterManager.setSelected(char.id);
                 renderCharacterCards();
+                startCharacterShowcaseAnimation();
+
                 // If game is currently running, re-skin Dave immediately
                 const activeGameScene = game.scene.getScene('GameScene') as GameScene;
                 if (activeGameScene && activeGameScene.getPlayer()) {
@@ -104,13 +205,16 @@ function initUI(game: Phaser.Game) {
     btnCharacterSelect?.addEventListener('click', () => {
         renderCharacterCards();
         charSelectModal?.classList.remove('hidden');
+        startCharacterShowcaseAnimation();
     });
     btnHudChar?.addEventListener('click', () => {
         renderCharacterCards();
         charSelectModal?.classList.remove('hidden');
+        startCharacterShowcaseAnimation();
     });
     btnCloseCharSelect?.addEventListener('click', () => {
         charSelectModal?.classList.add('hidden');
+        stopCharacterShowcaseAnimation();
     });
 
     // Populate Level Select Grid (1 to 10)
