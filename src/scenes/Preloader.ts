@@ -803,25 +803,60 @@ export class Preloader extends Phaser.Scene {
             ctx.save();
             const headY = 16 + headBob;
 
-            // Skin Tone Face
-            ctx.fillStyle = '#f6d5be';
-            ctx.strokeStyle = '#050510';
+            // 1. BASE FACE & ANATOMY
+            const skinBase = charId === 'daisy-hacker' ? '#fde2d0' : '#fcd5ba';
+            const skinShadow = charId === 'daisy-hacker' ? '#f0b89e' : '#e8a57e';
+
+            // Head contour
+            ctx.fillStyle = skinBase;
+            ctx.strokeStyle = '#1e1b18';
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.ellipse(cx, headY, 8.5, 9.5, 0, 0, Math.PI * 2);
-            ctx.fill(); ctx.stroke();
+            ctx.fill();
+            ctx.stroke();
+
+            // Jawline & Chin warm shading
+            ctx.fillStyle = skinShadow;
+            ctx.beginPath();
+            ctx.ellipse(cx + 1, headY + 5.5, 6.5, 3.5, 0, 0, Math.PI);
+            ctx.fill();
+
+            // Left Ear (visible in 3/4 profile)
+            ctx.fillStyle = skinBase;
+            ctx.strokeStyle = '#1e1b18';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.ellipse(15.5, headY + 1.2, 2.2, 3.2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            // Inner ear contour
+            ctx.strokeStyle = skinShadow;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(15.8, headY + 1.2, 1.2, -Math.PI / 2, Math.PI / 2);
+            ctx.stroke();
 
             if (charId === 'cyber-dave') {
                 // Backward Streetwear Cap (Charcoal with cyan backward bill)
                 ctx.fillStyle = '#0f172a';
+                ctx.strokeStyle = '#1e1b18';
+                ctx.lineWidth = 1;
                 ctx.beginPath();
-                ctx.roundRect(15, headY - 10, 19, 9, [5, 5, 2, 2]);
-                ctx.fill(); ctx.stroke();
+                ctx.roundRect(14.5, headY - 10.5, 19, 9.5, [5, 5, 2, 2]);
+                ctx.fill();
+                ctx.stroke();
+
                 // Backward bill pointing left
                 ctx.fillStyle = '#00ffff';
                 ctx.beginPath();
-                ctx.roundRect(11, headY - 5, 5, 3.5, 2);
+                ctx.roundRect(10.5, headY - 5.5, 5.5, 3.5, 2);
                 ctx.fill();
+                ctx.stroke();
+
+                // Dark hair side-fade
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(16, headY - 1, 3, 5);
 
                 // RGB Gaming Headset arch over cap
                 ctx.strokeStyle = '#00ff88';
@@ -840,13 +875,60 @@ export class Preloader extends Phaser.Scene {
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Dark Cyber Sunglasses
-                ctx.fillStyle = '#020617';
+                // Headset Mic Boom
+                ctx.strokeStyle = '#020617';
+                ctx.lineWidth = 1.5;
                 ctx.beginPath();
-                ctx.roundRect(18, headY - 1, 13, 4.5, 2);
-                ctx.fill();
+                ctx.moveTo(14, headY + 3);
+                ctx.quadraticCurveTo(20, headY + 7, 26, headY + 6);
+                ctx.stroke();
                 ctx.fillStyle = '#00ffff';
-                ctx.fillRect(20, headY, 7, 1); // Specular lens reflection
+                ctx.beginPath();
+                ctx.arc(26.5, headY + 6, 1.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Modern Wrap-Around Cyber Sunglasses
+                ctx.fillStyle = '#020617';
+                ctx.strokeStyle = '#00ffff';
+                ctx.lineWidth = 0.8;
+                ctx.beginPath();
+                ctx.roundRect(18.5, headY - 2.5, 13, 5, 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Gradient Visor Lens (Cyan to Hot Purple)
+                const lensGrad = ctx.createLinearGradient(19, headY - 2, 31, headY + 2);
+                lensGrad.addColorStop(0, '#00f2fe');
+                lensGrad.addColorStop(1, '#9d4edd');
+                ctx.fillStyle = lensGrad;
+                ctx.fillRect(19.5, headY - 1.8, 11, 3.5);
+
+                // Specular diagonal white reflection streak
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.beginPath();
+                ctx.moveTo(21, headY + 1.5);
+                ctx.lineTo(24, headY - 1.8);
+                ctx.lineTo(25.5, headY - 1.8);
+                ctx.lineTo(22.5, headY + 1.5);
+                ctx.closePath();
+                ctx.fill();
+
+                // Nose tip & bridge
+                ctx.strokeStyle = '#c4784a';
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(30, headY + 0.5);
+                ctx.lineTo(31.8, headY + 1.8);
+                ctx.lineTo(30.2, headY + 2.5);
+                ctx.stroke();
+
+                // Confident Gamer Smirk
+                ctx.strokeStyle = '#852b12';
+                ctx.lineWidth = 1.4;
+                ctx.beginPath();
+                ctx.moveTo(24.5, headY + 5.5);
+                ctx.lineTo(29.5, headY + 4.8);
+                ctx.stroke();
 
             } else if (charId === 'daisy-hacker') {
                 // Neon Magenta Undercut Hairstyle
@@ -854,43 +936,222 @@ export class Preloader extends Phaser.Scene {
                 ctx.fillRect(15, headY - 9, 6, 8); // Shaved side
                 ctx.fillStyle = '#ff0077';
                 ctx.beginPath();
-                ctx.moveTo(17, headY - 10);
-                ctx.bezierCurveTo(25, headY - 15, 33, headY - 8, 33, headY + 3);
+                ctx.moveTo(16, headY - 10);
+                ctx.bezierCurveTo(24, headY - 15, 33, headY - 8, 33, headY + 3);
                 ctx.lineTo(29, headY + 9);
                 ctx.lineTo(25, headY);
                 ctx.closePath();
                 ctx.fill();
 
-                // Glowing Holographic Eye-Visor
-                ctx.fillStyle = '#00ffcc';
+                // Expressive Right Eye
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#1e1b18';
+                ctx.lineWidth = 0.8;
+                ctx.beginPath();
+                ctx.ellipse(27, headY - 1.2, 2.6, 2.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Purple/Amethyst Iris
+                ctx.fillStyle = '#a855f7';
+                ctx.beginPath();
+                ctx.arc(27.8, headY - 1.2, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Dark Pupil & Catchlight
+                ctx.fillStyle = '#09090b';
+                ctx.beginPath();
+                ctx.arc(28, headY - 1.2, 0.9, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(27.2, headY - 2, 1, 1);
+
+                // Winged Eyeliner
+                ctx.strokeStyle = '#09090b';
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(25, headY - 2.5);
+                ctx.lineTo(29.8, headY - 2.8);
+                ctx.lineTo(31, headY - 3.8);
+                ctx.stroke();
+
+                // Sleek Eyebrow
+                ctx.strokeStyle = '#ec4899';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(24.5, headY - 4.5);
+                ctx.lineTo(29.5, headY - 5);
+                ctx.stroke();
+
+                // Glowing Holographic Eye-Visor Monocular (Over left eye area)
+                ctx.fillStyle = 'rgba(0, 255, 204, 0.35)';
+                ctx.strokeStyle = '#00ffcc';
+                ctx.lineWidth = 1.2;
                 ctx.shadowColor = '#00ffcc';
                 ctx.shadowBlur = 6;
-                ctx.beginPath();
-                ctx.roundRect(22, headY - 2, 9, 4.5, 2);
-                ctx.fill();
+                ctx.strokeRect(18.5, headY - 2.5, 6, 5);
+                ctx.fillRect(18.5, headY - 2.5, 6, 5);
                 ctx.shadowBlur = 0;
+                // Reticle crosshair inside monocular
                 ctx.fillStyle = '#ffffff';
-                ctx.fillRect(24, headY - 1, 4, 1.5);
+                ctx.fillRect(21, headY - 1, 1, 2);
+                ctx.fillRect(20, headY - 0.2, 3, 1);
+
+                // Elegant Nose Profile
+                ctx.strokeStyle = '#c4784a';
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(29.5, headY);
+                ctx.lineTo(31.5, headY + 1.8);
+                ctx.lineTo(30.2, headY + 2.4);
+                ctx.stroke();
+
+                // Dark Cherry / Magenta Lips & Smirk
+                ctx.strokeStyle = '#9f1239';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(25, headY + 5.4);
+                ctx.lineTo(29.5, headY + 4.8);
+                ctx.stroke();
+                ctx.fillStyle = '#e11d48';
+                ctx.fillRect(26.5, headY + 5.8, 2, 0.8);
 
             } else {
-                // Classic Dave Remastered Red Cap
-                ctx.fillStyle = '#dc2626';
+                // =========================================================
+                // CLASSIC DAVE REMASTERED: ICONIC RED CAP & EXPRESSIVE FACE
+                // =========================================================
+                // Hair: Dark chestnut curls at back of neck & sideburn
+                ctx.fillStyle = '#3f1d0b';
                 ctx.beginPath();
-                ctx.roundRect(15, headY - 10, 18, 9, [6, 6, 2, 2]);
-                ctx.fill(); ctx.stroke();
-                // Forward red visor bill
-                ctx.beginPath();
-                ctx.roundRect(23, headY - 3, 10, 3.5, 2);
-                ctx.fill(); ctx.stroke();
-                // White Cap Emblem
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(22, headY - 6, 2.5, 0, Math.PI * 2);
+                ctx.ellipse(15.5, headY + 4, 3, 4, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Eyes & Hair
-                ctx.fillStyle = '#451a03'; ctx.fillRect(16, headY - 2, 4, 5);
-                ctx.fillStyle = '#0f172a'; ctx.fillRect(26, headY - 2, 3, 3);
+                // Sideburn in front of ear framing temple
+                ctx.beginPath();
+                ctx.moveTo(17, headY - 1);
+                ctx.lineTo(19, headY - 1);
+                ctx.lineTo(18, headY + 4);
+                ctx.closePath();
+                ctx.fill();
+
+                // Cap Crown
+                ctx.fillStyle = '#dc2626';
+                ctx.strokeStyle = '#1e1b18';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(14.5, headY - 10.5, 18.5, 9.5, [7, 7, 2, 2]);
+                ctx.fill();
+                ctx.stroke();
+
+                // Cap crown seam & highlight
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(16, headY - 9);
+                ctx.quadraticCurveTo(24, headY - 11, 31, headY - 9);
+                ctx.stroke();
+
+                // Cap button on top
+                ctx.fillStyle = '#991b1b';
+                ctx.beginPath();
+                ctx.arc(23.5, headY - 10.5, 1.8, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Cap Visor / Bill (projecting forward to the right over face)
+                ctx.fillStyle = '#b91c1c';
+                ctx.strokeStyle = '#1e1b18';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(22, headY - 3.5, 12, 3.5, [2, 3, 2, 1]);
+                ctx.fill();
+                ctx.stroke();
+
+                // Visor edge highlight
+                ctx.fillStyle = '#ef4444';
+                ctx.fillRect(23, headY - 3.5, 10, 1);
+
+                // Embroidered White Cap Emblem with Dave 'D' Logo
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(21, headY - 6.5, 2.8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#b91c1c';
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
+                ctx.fillStyle = '#2563eb';
+                ctx.fillRect(20.2, headY - 7.5, 1.6, 2.2);
+
+                // Ambient drop-shadow cast by the visor onto the forehead
+                ctx.fillStyle = 'rgba(30, 27, 24, 0.25)';
+                ctx.fillRect(19, headY - 3, 11, 2);
+
+                // Bold Adventurer Eyebrow
+                ctx.strokeStyle = '#2d1406';
+                ctx.lineWidth = 1.8;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(23.5, headY - 3.2);
+                ctx.lineTo(29.5, headY - 4.2);
+                ctx.stroke();
+
+                // Expressive Eye: Sclera (White of eye)
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#1e1b18';
+                ctx.lineWidth = 0.8;
+                ctx.beginPath();
+                ctx.ellipse(27, headY - 1.2, 2.8, 2.1, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Bold Blue Hero Iris (Facing forward)
+                ctx.fillStyle = '#2563eb';
+                ctx.beginPath();
+                ctx.ellipse(27.8, headY - 1.2, 1.7, 1.9, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Dark Pupil
+                ctx.fillStyle = '#09090b';
+                ctx.beginPath();
+                ctx.arc(28.1, headY - 1.2, 1, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Crisp Specular Glint (Catchlight bringing eyes to life!)
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(27.2, headY - 2.2, 1.1, 1.1);
+
+                // Defined Adventurer Nose Bridge & Tip
+                ctx.strokeStyle = '#c4784a';
+                ctx.lineWidth = 1.3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                ctx.moveTo(29, headY - 0.5);
+                ctx.lineTo(31.8, headY + 1.2);
+                ctx.lineTo(30, headY + 2.2);
+                ctx.stroke();
+
+                // Nostril shadow
+                ctx.fillStyle = '#9c542b';
+                ctx.fillRect(29.5, headY + 1.8, 1.2, 1);
+
+                // Natural healthy cheek flush
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.16)';
+                ctx.beginPath();
+                ctx.ellipse(24.5, headY + 2.2, 2.5, 1.8, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Confident Dave Smirk
+                ctx.strokeStyle = '#852b12';
+                ctx.lineWidth = 1.4;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(24.5, headY + 5.2);
+                ctx.quadraticCurveTo(27.5, headY + 5.5, 29.5, headY + 4.2);
+                ctx.stroke();
+
+                // Lower lip warmth
+                ctx.fillStyle = '#c77045';
+                ctx.fillRect(26, headY + 6.2, 2.5, 0.8);
             }
             ctx.restore();
 
