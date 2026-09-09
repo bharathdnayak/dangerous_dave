@@ -40,13 +40,13 @@ export const LEVELS: LevelData[] = [
             "B                                                  B",
             "B                                                  B",
             "B   G                                    T         B",
-            "BBBBBBB                                BBBBB       B",
-            "B     BBBB    R       1              BBBBB         B",
-            "B           BBBBB   BBBBB   BBBBB  BBBBB           B",
+            "BBBBBBB                                BBBBBB      B",
             "B                                                  B",
-            "B             R       S       E              C   D B",
-            "B @   BBB   BBBB    BBBB    BBBB    BBBB   BBBBBBBBB",
-            "BBBBBBWWBBBBWWWWBBBBWWWWBBBBWWWWBBBBWWWWBBBBBBBBBBBB",
+            "B        BBBB   R       1       S            BBBBB B",
+            "B             BBBBB   BBBBB   BBBBB     BBBB       B",
+            "B                                                  B",
+            "B @          R       S       E       C           D B",
+            "BBBBBBBWWBBBBBWWBBBBBWWBBBBBWWBBBBBWWBBBBBBBBBBBBBBB",
             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
         ]
     },
@@ -105,12 +105,12 @@ export const LEVELS: LevelData[] = [
             "B                                          T          B",
             "B                                        BBBBBB       B",
             "B       R          S                   BBBBBB         B",
-            "B     BBBBB      BBBBB               BBBBBB           B",
+            "B     BBBBB      BBBBB                                B",
+            "B                                            BBBBB    B",
             "B                                                     B",
-            "B             R       S       E              C      D B",
-            "B           BBBB    BBBB    BBBB    BBBB   BBBB   BBBBB",
-            "B @  BBBB   BBBB    BBBB    BBBB    BBBB   BBBB   BBBBB",
-            "BBBBBBBWWBBBWWWWBBBBWWWWBBBBWWWWBBBBWWWWBBBBWWWWBBBBBBB"
+            "B @          R       S       E       C              D B",
+            "BBBBBBBWWBBBBBWWBBBBBWWBBBBBWWBBBBBWWBBBBBWWBBBBBBBBBBB",
+            "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
         ]
     },
     {
