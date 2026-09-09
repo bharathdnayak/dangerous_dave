@@ -67,7 +67,7 @@ export const LEVELS: LevelData[] = [
             "B                                                     B",
             "B   J                         BBBB                  D B",
             "B @ B                       BBBBBB               BBBBBB",
-            "BBBBBBBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBBBBBBBBBBBB",
+            "BBBBBBBFFFFFFFFFFFFFFFFFFFFFBBBBBBFFFFFFFFFBBBBBBBBBBBB",
             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
         ]
     },
@@ -131,7 +131,7 @@ export const LEVELS: LevelData[] = [
             "B    R                P                               B",
             "B  BBBBB              P                             D B",
             "B @BBBBB              P                           BBBBB",
-            "BBBBBBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBBBBBBBBB"
+            "BBBBBBBBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBBBBBBBBB"
         ]
     },
     {
@@ -172,7 +172,7 @@ export const LEVELS: LevelData[] = [
             "B                                                          B",
             "B   J           F         F         F                    D B",
             "B @ B         BBBBB     BBBBB     BBBBB                BBBBB",
-            "BBBBBBBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBBBBBBBBBBBBB",
+            "BBBBBBBFFFFFFFBBBBBFFFFFBBBBBFFFFFBBBBBFFFFFFFFBBBBBBBBBBBBB",
             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
         ]
     },
@@ -214,7 +214,7 @@ export const LEVELS: LevelData[] = [
             "B @ G   J                                    C                  B",
             "BBBBBBBBBBB             R          S       BBBBB              D B",
             "BBBBBBBBBBB           BBBBB      BBBBB                      BBBBB",
-            "BBBBBBBBBBBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBBBBBBBBBBBBBB",
+            "BBBBBBBBBBBFFFFFFFFFFFBBBBBFFFFFFBBBBBFFFFFFFFFFFFFBBBBBBBBBBBBBB",
             "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
         ]
     }
