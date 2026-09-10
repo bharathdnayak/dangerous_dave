@@ -199,7 +199,7 @@ export const LEVELS: LevelData[] = [
     },
     {
         id: 10,
-        title: "LEVEL 10: DAVE'S FINAL TRIUMPH",
+        title: "LEVEL 10: THE FINAL ESCAPE",
         hint: "Both Gun and Jetpack at your command! Conquer the ultimate fortress.",
         width: 65,
         height: 12,

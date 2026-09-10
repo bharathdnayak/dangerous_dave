@@ -1,16 +1,16 @@
-# 🎮 Dangerous Dave: 2026 Modern HD Edition
+# 🎮 The Shadow Escape: 2026 Modern HD Edition
 ### 7th Semester UI/UX Project
 
-A feature-complete, modern web remake of John Romero's 1988 DOS classic **Dangerous Dave**, completely modernized with high-definition illustrated graphics, character selection, modern game-feel physics, responsive controls, procedural Web Audio, and an intuitive UI layer.
+A feature-complete, modern web platformer **The Shadow Escape**, completely designed with high-definition illustrated graphics, character selection, modern game-feel physics, responsive controls, procedural Web Audio, and an intuitive UI layer.
 
 ---
 
-## 🚀 Key Modernizations & Innovations Over Original DOS Dave
+## 🚀 Key Modernizations & Innovations Over Classic Retro Platformers
 
-| Original DOS Flaw | Our 2026 Modern Solution |
+| Classic Flaw | Our 2026 Modern Solution |
 | :--- | :--- |
 | **Chunky Pixel Blocks & 16-Color CGA/EGA** | **High-Definition Illustrated HD 2D Assets**: Procedural anti-aliased canvas rendering, animated 5-frame bezier fire with glowing embers, photorealistic golden chalice trophy, 2026 Sci-Fi Plasma Blaster, and Titanium Ion Jetpack. |
-| **Only 1 Character (Dave)** | **Character Selection Roster**: Choose between **Cyber Dave** (Gen Z streamer/gamer with RGB headset & streetwear hoodie), **Daisy Vex** (Cyberpunk hacker with neon bob & cyber visor), and **Classic Dave HD** (Remastered red cap & blue polo). Switchable anytime from HUD or pause menu. |
+| **Single Character Locked** | **Character Selection Roster**: Choose between **Cyber Shadow** (Gen Z cyber infiltrator with RGB headset & streetwear hoodie), **Daisy Vex** (Cyberpunk hacker with neon bob & cyber visor), and **Classic Shadow** (Remastered red cap & blue polo). Switchable anytime from HUD or pause menu. |
 | **Rigid, Unforgiving Jumping & Wall Clumping** | **Calibrated Physics & Jump Arc**: Step heights limited to $\le 2$ tiles with smooth jump clearance, **Coyote Time** (120ms window to jump after leaving ledges), **Jump Buffering** (120ms queue before landing), and **Variable Jump Height**. |
 | **Unfair 1-Pixel Death Hitboxes** | Hazards (fire, water) and enemy hitboxes are tuned with fair, generous padding inside visual boundaries for satisfying, tight gameplay. |
 | **Clunky Jetpack & Fast Fuel Depletion** | **Hover Jetpack with Dedicated Toggle**: Press `J` or tap HUD button to toggle flight mode, offering smooth 4-way omnidirectional thruster control and 25–50 seconds of generous fuel capacity. |
@@ -32,7 +32,7 @@ A feature-complete, modern web remake of John Romero's 1988 DOS classic **Danger
 
 ---
 
-## 🏆 Levels & Progression (All 10 Levels Recreated)
+## 🏆 Levels & Progression (All 10 Levels)
 
 1. **Level 1: The Entry** — Basic jumping, gems, trophy introduction, exit door.
 2. **Level 2: Water Pit & Gun** — Water hazards, gun pickup, first spider encounter.
@@ -43,7 +43,7 @@ A feature-complete, modern web remake of John Romero's 1988 DOS classic **Danger
 7. **Level 7: Alien Invasion** — Fast sinusoidal UFO saucers.
 8. **Level 8: Jetpack Gauntlet** — Narrow vertical fire corridors testing fuel efficiency.
 9. **Level 9: The Gauntlet** — Combined UFO and spider patrols.
-10. **Level 10: Dave's Final Triumph** — The ultimate challenge combining all mechanics.
+10. **Level 10: The Final Escape** — The ultimate challenge combining all mechanics.
 
 ---
 

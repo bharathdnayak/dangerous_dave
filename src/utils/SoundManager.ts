@@ -1,4 +1,4 @@
-// Retro Web Audio Synthesizer for Dangerous Dave
+// Retro Web Audio Synthesizer for The Shadow Escape
 // Generates crisp, lag-free sound effects without external audio files
 
 class RetroSoundManager {

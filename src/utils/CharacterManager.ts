@@ -14,8 +14,8 @@ export interface CharacterConfig {
 export const CHARACTERS: CharacterConfig[] = [
     {
         id: 'cyber-dave',
-        name: 'CYBER DAVE',
-        tagline: 'Gen Z Pro Streamer',
+        name: 'CYBER SHADOW',
+        tagline: 'Gen Z Cyber Infiltrator',
         description: 'RGB headphones, dual-tone cyber visor, oversized hoodie, and neon kicks.',
         themeColor: '#00FFFF',
         trailParticleColor: 0x00FFFF,
@@ -38,8 +38,8 @@ export const CHARACTERS: CharacterConfig[] = [
     },
     {
         id: 'classic-dave',
-        name: 'CLASSIC DAVE',
-        tagline: '1988 Remastered',
+        name: 'CLASSIC SHADOW',
+        tagline: 'Retro Infiltrator',
         description: 'The legendary red snapback hero, remastered in crisp 2026 illustrated vector art.',
         themeColor: '#F59E0B',
         trailParticleColor: 0xF59E0B,
